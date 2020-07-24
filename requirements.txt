@@ -1,0 +1,9 @@
+torch
+torchvision
+streamlit
+pandas
+black
+isort
+gputil
+psutil
+humanize
