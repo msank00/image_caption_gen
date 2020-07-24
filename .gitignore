@@ -141,3 +141,7 @@ cython_debug/
 data/
 model/
 output/
+
+**/*.h5
+**/*train_encoded_images.p
+**/*.jpg
