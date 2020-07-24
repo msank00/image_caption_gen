@@ -3,7 +3,8 @@ config:
     CAPTION_DATA_DIR: "data/main_caption_data/"
     CAPTION_FILE: "data/main_caption_data/Flickr8k_token_processed_flat.csv"
     IMAGE_ID_FILE_TRAIN: "data/main_caption_data/Flickr_8k.trainImages.txt"
-    IMAGE_DATA_DIR: "data/flickr_data/Flickr_Data/Images/"
+    IMAGE_ID_FILE_VAL: "data/main_caption_data/Flickr_8k.devImages.txt"
+    IMAGE_DATA_DIR: "data/images/"
     MODEL_DIR: "model/"
     DEV_MODE: False
     BATCH_SIZE: 64
@@ -14,7 +15,7 @@ config:
     WORD_EMBED_SIZE: 300
     # number of features in hidden state of the RNN decoder
     HIDDEN_SIZE: 512
-    NUM_EPOCHS: 3
+    NUM_EPOCHS: 1
     # determines frequency of saving model weights
     SAVE_EVERY: 1
     PRINT_EVERY: 5

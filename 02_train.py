@@ -39,6 +39,19 @@ if __name__ == "__main__":
                                 vocab_file=config.VOCAB_FILE,
                                 vocab_from_file=config.VOCAB_FROM_FILE)
 
+    # Build data loader.
+    val_data_loader = get_data_loader(transform=transform_train, 
+                                caption_file=config.CAPTION_FILE, 
+                                image_id_file=config.IMAGE_ID_FILE_VAL, 
+                                image_folder=config.IMAGE_DATA_DIR, 
+                                config=config,
+                                mode="validation",
+                                batch_size=config.BATCH_SIZE,
+                                vocab_threshold=config.VOCAB_THRESHOLD, 
+                                vocab_file=config.VOCAB_FILE,
+                                vocab_from_file=True) # validation data should use vocab generated from train
+
+
     # The size of the vocabulary.
     vocab_size = len(train_data_loader.dataset.vocab)
 
