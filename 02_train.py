@@ -84,6 +84,10 @@ if __name__ == "__main__":
     old_time = time.time()
     tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
 
+    dev_mode = False
+
+    print(f"Running in dev_mode: {dev_mode}")
+
     for epoch in tqdm_epochs:
         
         tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
@@ -139,8 +143,9 @@ if __name__ == "__main__":
             
             tqdm_train_steps.set_description(f"TRAIN BATCH: Loss: {np.round(train_loss,4)}, PPL: {np.round(train_perplexity, 4)}")
 
-            if i_step == 5:
-                break
+            if dev_mode:
+                if i_step == 5:
+                    break
 
         avg_train_loss = np.round(total_train_loss / total_train_step,4)
         avg_train_perplexity = np.round(total_train_perplexity / total_train_step,4)
@@ -180,9 +185,10 @@ if __name__ == "__main__":
                 
                 tqdm_val_steps.set_description(f"VAL BATCH: Loss: {np.round(val_loss,4)}, PPL: {np.round(val_perplexity, 4)}")
                 
-                if i_step == 5:
-                    break
-                
+                if dev_mode:
+                    if i_step == 5:
+                        break
+                    
         avg_val_loss = np.round(total_val_loss / total_validation_step,4)
         avg_val_perplexity = np.round(total_val_perplexity / total_validation_step,4)
                 

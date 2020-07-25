@@ -97,7 +97,7 @@ if __name__ == "__main__":
     encoder.to(device)
     decoder.to(device)
     
-    test_image_file = "asset/test_image/horse_run.jpg"
+    test_image_file = "asset/test_image/horse_run.png"
     pred_caption = predict_image_caption(test_image_file, 
                                          transform_image=transform_test, 
                                          model_encoder=encoder, 
