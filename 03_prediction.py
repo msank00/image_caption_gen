@@ -60,6 +60,13 @@ if __name__ == "__main__":
     config = Config("config.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    test_data_loader = get_data_loader(transform=transform_test,
+                                   caption_file=config.CAPTION_FILE,
+                                   image_id_file=config.IMAGE_ID_FILE_TEST, 
+                                   image_folder=config.IMAGE_DATA_DIR, 
+                                   config=config,
+                                   mode='test')
 
     # TODO #2: Specify the saved models to load.
     encoder_file = f"{config.MODEL_DIR}encoder-1.pkl"
@@ -71,6 +78,7 @@ if __name__ == "__main__":
     # TODO #3: Select appropriate values for the Python variables below.
     embed_size = config.IMG_EMBED_SIZE
     hidden_size = config.HIDDEN_SIZE
+    vocab_size = len(test_data_loader.dataset.vocab)
 
     # Initialize the encoder and decoder, and set each to inference mode.
     encoder = EncoderCNN(embed_size)
@@ -83,6 +91,7 @@ if __name__ == "__main__":
     # map location helps in save and load accross devices (gpu/cpu)
     encoder.load_state_dict(torch.load(encoder_file, map_location=device))
     decoder.load_state_dict(torch.load(decoder_file, map_location=device))
+    print("Model loaded...")
 
     # Move models to GPU if CUDA is available.
     encoder.to(device)
