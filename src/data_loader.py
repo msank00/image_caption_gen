@@ -91,7 +91,7 @@ class FlickrDataset(Dataset):
         return indices
     
     def __len__(self):
-        return len(df)
+        return len(self.df_data)
     
 
 def get_data_loader(transform:tv.transforms, 

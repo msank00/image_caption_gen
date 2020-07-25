@@ -50,13 +50,16 @@ class DecoderRNN(nn.Module):
         
         return out
     
-    def sample(self, 
+    def predict_token_ids(self, 
                 inputs:torch.Tensor,
                 states=None, 
                 max_len=20):
         """Given a preprocessed image tensor,
-        returns predicted image caption sentence 
-        (list of tensor ids of length max_len)
+        returns predicted image caption sentence as
+        list of tensor ids of length max_len. These 
+        list of token ids need further mapping using 
+        vocabulary dict:idx2word to get the final 
+        sentence.
 
         :param inputs: [description]
         :type inputs: torch.Tensor

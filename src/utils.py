@@ -22,6 +22,7 @@ class Config:
         self.CAPTION_FILE = self.config["config"]["CAPTION_FILE"]
         self.IMAGE_ID_FILE_TRAIN = self.config["config"]["IMAGE_ID_FILE_TRAIN"]
         self.IMAGE_ID_FILE_VAL = self.config["config"]["IMAGE_ID_FILE_VAL"]
+        self.IMAGE_ID_FILE_TEST = self.config["config"]["IMAGE_ID_FILE_TEST"]
         self.IMAGE_DATA_DIR = self.config["config"]["IMAGE_DATA_DIR"]
         self.MODEL_DIR = self.config["config"]["MODEL_DIR"]
         self.DEV_MODE = self.config["config"]["DEV_MODE"]

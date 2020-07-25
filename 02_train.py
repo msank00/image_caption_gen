@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter("ignore")
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -73,16 +75,25 @@ if __name__ == "__main__":
     optimizer = get_optimizer(params, optim_type="adam", learning_rate=0.001) 
 
     # Set the total number of training steps per epoch.
-    total_step = math.ceil(len(train_data_loader.dataset.caption_lengths) / train_data_loader.batch_sampler.batch_size)
+    total_train_step = math.ceil(len(train_data_loader.dataset.caption_lengths) / train_data_loader.batch_sampler.batch_size)
+
+    # Set the total number of validation steps per epoch.
+    total_validation_step = math.ceil(len(val_data_loader.dataset.caption_lengths) / val_data_loader.batch_sampler.batch_size)
+
 
     old_time = time.time()
+    tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
 
-    for epoch in tqdm(range(1, config.NUM_EPOCHS+1)):
+    for epoch in tqdm_epochs:
         
-        tqdm_steps = tqdm(range(1, total_step+1), desc='Bar desc', leave=True)
+        tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
         
-        #for i_step in tqdm(range(1, total_step+1)):
-        for i_step in tqdm_steps:
+        # TRAINING
+        encoder.train()
+        decoder.train()
+        total_train_loss = 0.0
+        total_train_perplexity = 0.0
+        for i_step in tqdm_train_steps:
                 
             if time.time() - old_time > 60:
                 old_time = time.time()
@@ -111,6 +122,7 @@ if __name__ == "__main__":
             # Calculate the batch loss.
             loss = criterion(outputs.view(-1, vocab_size), captions.view(-1))
             
+            
             # Backward pass.
             loss.backward()
             
@@ -118,17 +130,64 @@ if __name__ == "__main__":
             optimizer.step()
                 
             # Get training statistics.
-            stats = 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f' % (epoch, config.NUM_EPOCHS, i_step, total_step, loss.item(), np.exp(loss.item()))
+            # stats = 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f' % (epoch, config.NUM_EPOCHS, i_step, total_step, loss.item(), np.exp(loss.item()))
+            train_loss = loss.item()
+            total_train_loss += train_loss
             
-            tqdm_steps.set_description(f"Bar desc train loss: {np.round(loss.item(),4)}, train perplexityt: {np.round(np.exp(loss.item()),4)}")
+            train_perplexity = np.exp(train_loss)
+            total_train_perplexity += train_perplexity
             
-            # Print training statistics (on same line).
-            # print(stats)
-            
-            # Print training statistics (on different line).
-            #if i_step % config.PRINT_EVERY == 0:
-            #    print(stats)
+            tqdm_train_steps.set_description(f"TRAIN BATCH: Loss: {np.round(train_loss,4)}, PPL: {np.round(train_perplexity, 4)}")
+
+            if i_step == 5:
+                break
+
+        avg_train_loss = np.round(total_train_loss / total_train_step,4)
+        avg_train_perplexity = np.round(total_train_perplexity / total_train_step,4)
+        
+        # VALIDATION
+        encoder.eval()
+        decoder.eval()
+        total_val_loss = 0.
+        total_val_perplexity = 0.
+        tqdm_val_steps = tqdm(range(1, total_validation_step+1), desc='VAL BATCH:', leave=True)
+        with torch.no_grad():
+            for i_step in tqdm_val_steps:          
+                # Randomly sample a caption length, and sample indices with that length.
+                indices = val_data_loader.dataset.get_train_indices()
+                # Create and assign a batch sampler to retrieve a batch with the sampled indices.
+                new_sampler = data.sampler.SubsetRandomSampler(indices=indices)
+                val_data_loader.batch_sampler.sampler = new_sampler
                 
+                # Obtain the batch.
+                images, captions = next(iter(val_data_loader))
+
+                # Move batch of images and captions to GPU if CUDA is available.
+                images = images.to(device)
+                captions = captions.to(device)
+                
+                # Pass the inputs through the CNN-RNN model.
+                features = encoder(images)
+                outputs = decoder(features, captions)
+                
+                # Calculate the batch loss.
+                loss = criterion(outputs.view(-1, vocab_size), captions.view(-1))
+                val_loss = loss.item()
+                total_val_loss += val_loss
+                
+                val_perplexity = np.exp(val_loss)
+                total_val_perplexity += val_perplexity
+                
+                tqdm_val_steps.set_description(f"VAL BATCH: Loss: {np.round(val_loss,4)}, PPL: {np.round(val_perplexity, 4)}")
+                
+                if i_step == 5:
+                    break
+                
+        avg_val_loss = np.round(total_val_loss / total_validation_step,4)
+        avg_val_perplexity = np.round(total_val_perplexity / total_validation_step,4)
+                
+        tqdm_epochs.set_description(f"EPOCH: Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}")        
+            
         # Save the weights.
         if epoch % config.SAVE_EVERY == 0:
             torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-{epoch}.pkl"))
