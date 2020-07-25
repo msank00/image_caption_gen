@@ -69,8 +69,8 @@ if __name__ == "__main__":
                                    mode='test')
 
     # TODO #2: Specify the saved models to load.
-    encoder_file = f"{config.MODEL_DIR}encoder-3.pkl"
-    decoder_file = f"{config.MODEL_DIR}decoder-3.pkl"
+    encoder_file = f"{config.MODEL_DIR}encoder-10.pkl"
+    decoder_file = f"{config.MODEL_DIR}decoder-10.pkl"
     
     assert os.path.exists(encoder_file), f"Encoder model: '{encoder_file}' doesn't not exist."
     assert os.path.exists(decoder_file), f"Decoder model: '{decoder_file}' doesn't not exist."
