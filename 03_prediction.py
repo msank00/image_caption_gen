@@ -69,8 +69,8 @@ if __name__ == "__main__":
                                    mode='test')
 
     # TODO #2: Specify the saved models to load.
-    encoder_file = f"{config.MODEL_DIR}encoder-1.pkl"
-    decoder_file = f"{config.MODEL_DIR}decoder-1.pkl"
+    encoder_file = f"{config.MODEL_DIR}encoder-3.pkl"
+    decoder_file = f"{config.MODEL_DIR}decoder-3.pkl"
     
     assert os.path.exists(encoder_file), f"Encoder model: '{encoder_file}' doesn't not exist."
     assert os.path.exists(decoder_file), f"Decoder model: '{decoder_file}' doesn't not exist."
@@ -97,7 +97,9 @@ if __name__ == "__main__":
     encoder.to(device)
     decoder.to(device)
     
-    test_image_file = "asset/test_image/horse_run.png"
+    # test_image_file = "asset/test_image/man_run.png"
+    # test_image_file = "data/test_images/3234115903_f4dfc8fc75.jpg"
+    test_image_file = "data/test_images/241347760_d44c8d3a01.jpg"
     pred_caption = predict_image_caption(test_image_file, 
                                          transform_image=transform_test, 
                                          model_encoder=encoder, 

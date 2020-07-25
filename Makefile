@@ -38,6 +38,9 @@ dataval:
 train:
 	python3 02_train.py
 
+predict:
+	python3 03_prediction.py
+
 clean-data:
 	python3 00_clean_data.py
 
