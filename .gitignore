@@ -144,4 +144,6 @@ output/
 
 **/*.h5
 **/*train_encoded_images.p
+**/*.pt
 **/*.jpg
+**/*.pkl
