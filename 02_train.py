@@ -7,6 +7,7 @@ from src.data_loader import get_data_loader
 from src.model import EncoderCNN, DecoderRNN
 from src.loss import get_loss_function
 from src.optimizer import get_optimizer
+from src.evaluation import performance_plot
 import math
 from src.utils import Config
 import torch.utils.data as data
@@ -86,6 +87,12 @@ if __name__ == "__main__":
     old_time = time.time()
     tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
 
+    train_loss_list = []
+    val_loss_list = []
+
+    train_ppl_list = []
+    val_ppl_list = []
+    
     for epoch in tqdm_epochs:
         
         tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
@@ -148,6 +155,9 @@ if __name__ == "__main__":
         avg_train_loss = np.round(total_train_loss / total_train_step,4)
         avg_train_perplexity = np.round(total_train_perplexity / total_train_step,4)
         
+        train_loss_list.append(avg_train_loss)
+        train_ppl_list.append(avg_train_perplexity)
+        
         # VALIDATION
         encoder.eval()
         decoder.eval()
@@ -187,15 +197,31 @@ if __name__ == "__main__":
                     if i_step == 5:
                         break
                     
+        # performance per epoch
         avg_val_loss = np.round(total_val_loss / total_validation_step,4)
         avg_val_perplexity = np.round(total_val_perplexity / total_validation_step,4)
-                
+
+        val_loss_list.append(avg_val_loss)
+        val_ppl_list.append(avg_val_perplexity)
+                        
         tqdm_epochs.set_description(f"EPOCH: Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}")        
             
         # Save the weights.
         if epoch % config.SAVE_EVERY == 0:
             torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-{epoch}.pkl"))
             torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder-{epoch}.pkl"))
+
+    performance_plot(train_loss_list, 
+                     val_loss_list, 
+                     outfile="asset/evaluation_plot/loss_plot.png",
+                     title="Loss vs Epoch",
+                     ylab="Avg. Batch Loss")
+
+    performance_plot(train_ppl_list, 
+                     val_ppl_list, 
+                     outfile="asset/evaluation_plot/ppl_plot.png",
+                     title="Perplpexity vs Epoch",
+                     ylab="Avg. Batch Perplexity")
 
 
     print("done")
