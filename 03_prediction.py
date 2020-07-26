@@ -97,9 +97,9 @@ if __name__ == "__main__":
     encoder.to(device)
     decoder.to(device)
     
-    # test_image_file = "asset/test_image/man_run.png"
-    # test_image_file = "data/test_images/3234115903_f4dfc8fc75.jpg"
-    test_image_file = "data/test_images/241347760_d44c8d3a01.jpg"
+    test_image_file = "asset/test_image/horse_run.png"
+    # test_image_file = "asset/test_image/3234115903_f4dfc8fc75.jpg"
+    # test_image_file = "asset/test_image/241347760_d44c8d3a01.jpg"
     pred_caption = predict_image_caption(test_image_file, 
                                          transform_image=transform_test, 
                                          model_encoder=encoder, 
