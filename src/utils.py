@@ -37,6 +37,7 @@ class Config:
         self.VERBOSE = self.config["config"]["VERBOSE"]
         self.VOCAB_FILE = self.config["config"]["VOCAB_FILE"]
         self.VOCAB_FROM_FILE = self.config["config"]["VOCAB_FROM_FILE"]
+        self.DEV_MODE = self.config["config"]["DEV_MODE"]
         
 
     def __str__(self):

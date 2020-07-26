@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # config.set_attribute()
 
     # filename = f"{config.DATA_DIR}/flickr_caption_data_processed/Flickr8k_token_processed.csv"
-    filename = f"{config.DATA_DIR}/flickr_caption_data_processed/Flickr8k_token_processed_flat.csv"
+    filename = f"{config.CAPTION_FILE}"
     df = pd.read_csv(filename, sep="\t")
 
     # get_sample_data_from_clean_flat(df_flat)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     for i in range(int(n)):
         image_name, caption = get_sample_data_from_clean_flat(df)
-        image_file = f"{config.DATA_DIR}/images/{image_name}"
+        image_file = f"{config.IMAGE_DATA_DIR}{image_name}"
 
         image = Image.open(image_file)
 

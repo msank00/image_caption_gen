@@ -1,5 +1,5 @@
 import warnings
-warnings.simplefilter("ignore")
+warnings.simplefilter("ignore", category=DeprecationWarning)
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -19,6 +19,8 @@ if __name__ == "__main__":
     
 
     config = Config("config.yaml")
+    if config.DEV_MODE:
+        warnings.warn(f"Running in dev_mode: {config.DEV_MODE}")
 
     # (Optional) TODO #2: Amend the image transform below.
     transform_train = transforms.Compose([ 
@@ -84,10 +86,6 @@ if __name__ == "__main__":
     old_time = time.time()
     tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
 
-    dev_mode = False
-
-    print(f"Running in dev_mode: {dev_mode}")
-
     for epoch in tqdm_epochs:
         
         tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
@@ -143,7 +141,7 @@ if __name__ == "__main__":
             
             tqdm_train_steps.set_description(f"TRAIN BATCH: Loss: {np.round(train_loss,4)}, PPL: {np.round(train_perplexity, 4)}")
 
-            if dev_mode:
+            if config.DEV_MODE:
                 if i_step == 5:
                     break
 
@@ -185,7 +183,7 @@ if __name__ == "__main__":
                 
                 tqdm_val_steps.set_description(f"VAL BATCH: Loss: {np.round(val_loss,4)}, PPL: {np.round(val_perplexity, 4)}")
                 
-                if dev_mode:
+                if config.DEV_MODE:
                     if i_step == 5:
                         break
                     

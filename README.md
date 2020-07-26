@@ -40,16 +40,21 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
 2. [x] Create Network
    1. [x] Create Encoder
    2. [x] Create Decoder
-      1. [ ] Check the LSTM syntaxt, pytorch documentation
+      1. [x] Check the LSTM syntaxt, pytorch documentation
 3. [x] Optimizer
 4. [x] Loss/objective function/criterion
 5. [x] Train model
    1. [ ] Callbacks
       1. [ ] Learning rate scheduler, ..plateaue
-      2. [ ] Saving best model...
-6. [ ] Prediction
-7. [ ] Serving
-8. [ ] Docker
-9. [ ] Deployment (Heroku)
+      2. [ ] Saving best model
+6. [ ] Performance plot
+7. [x] Prediction
+8. [ ] Model Debugging
+   1. [ ] Debug Overfitting
+   2. [ ] Check training `input` + `label` order
+9. [ ] Experiment tracker
+10. [ ] Serving
+11. [ ] Docker
+12. [ ] Deployment (Heroku)
 
 -----------

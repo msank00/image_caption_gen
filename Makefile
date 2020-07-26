@@ -8,6 +8,7 @@ project-template:
 
 env:
 	pip3 install -r requirements.txt
+	python3 -c "import nltk; nltk.download('punkt')"
 	apt-get install htop
 
 git-config:
@@ -73,7 +74,5 @@ prep-main-data:
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.testImages.txt data/main_caption_data/
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.devImages.txt data/main_caption_data/
 	mv data/flickr_data/Flickr_Data/Images/* data/images/
-
-	# mv *.csv data/
 
 
