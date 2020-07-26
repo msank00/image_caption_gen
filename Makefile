@@ -75,4 +75,22 @@ prep-main-data:
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.devImages.txt data/main_caption_data/
 	mv data/flickr_data/Flickr_Data/Images/* data/images/
 
+prepare_model_dir:
+	# export KAGGLE_DATASET_ID="sankarshan7/msank-tweet-sentiment"
 
+	# kaggle datasets init -p output
+
+
+	# download previous models to keep the output directory in sync with kaggle
+	# else old files may get deleted in remote while pushing
+	kaggle datasets download sankarshan7/image-caption
+	mv *.zip model/
+	unzip 'model/*.zip'
+	rm model/*.zip
+	cp dataset-metadata.json model/
+
+	python3 update_meta_json.py
+	touch model/sample_new.txt
+
+publish_output:
+	kaggle datasets version -p model -m "Updated data"
