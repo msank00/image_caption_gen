@@ -1,13 +1,32 @@
 from torchvision import transforms
 from src.data_loader import get_data_loader
-from src.utils import Config
+from src.utils import Config, get_training_data
 
 from PIL import Image
-import numpy as np
 
 import os
 import torch
 from src.model import EncoderCNN, DecoderRNN
+
+import numpy as np
+import pandas as pd 
+import shutil
+
+
+
+def pick_random_test_image(df: pd.DataFrame):
+    idx = np.random.randint(low=0, high=len(df))
+    image_id = df.iloc[idx]["IMAGE_ID"]
+    caption = df.iloc[idx]["CAPTION"]
+    return image_id, caption
+
+
+def copy_file_to_correct_folder(image_id: str):
+    file_src_path = f"{config.IMAGE_DATA_DIR}{image_id}"
+    file_destination_path = f"asset/test_image/{image_id}"
+    shutil.copy(file_src_path, file_destination_path)
+
+
 
 def predict_image_caption(image_file: str, 
                           transform_image: transforms, 
@@ -69,8 +88,8 @@ if __name__ == "__main__":
                                    mode='test')
 
     # TODO #2: Specify the saved models to load.
-    encoder_file = f"{config.MODEL_DIR}encoder-10.pkl"
-    decoder_file = f"{config.MODEL_DIR}decoder-10.pkl"
+    encoder_file = f"{config.MODEL_DIR}encoder-1.pkl"
+    decoder_file = f"{config.MODEL_DIR}decoder-1.pkl"
     
     assert os.path.exists(encoder_file), f"Encoder model: '{encoder_file}' doesn't not exist."
     assert os.path.exists(decoder_file), f"Decoder model: '{decoder_file}' doesn't not exist."
@@ -82,28 +101,41 @@ if __name__ == "__main__":
 
     # Initialize the encoder and decoder, and set each to inference mode.
     encoder = EncoderCNN(embed_size)
-    encoder.eval()
-
     decoder = DecoderRNN(embed_size, hidden_size, vocab_size)
-    decoder.eval()
 
     # Load the trained weights.
     # map location helps in save and load accross devices (gpu/cpu)
-    encoder.load_state_dict(torch.load(encoder_file, map_location=device))
-    decoder.load_state_dict(torch.load(decoder_file, map_location=device))
+    encoder.load_state_dict(torch.load(encoder_file, map_location=device), strict=False)
+    decoder.load_state_dict(torch.load(decoder_file, map_location=device), strict=False)
+    encoder.eval()
+    decoder.eval()
+    
     print("Model loaded...")
 
     # Move models to GPU if CUDA is available.
     encoder.to(device)
     decoder.to(device)
     
-    test_image_file = "asset/test_image/train_track.jpg"
-    # test_image_file = "asset/test_image/3234115903_f4dfc8fc75.jpg"
-    # test_image_file = "asset/test_image/241347760_d44c8d3a01.jpg"
-    pred_caption = predict_image_caption(test_image_file, 
-                                         transform_image=transform_test, 
-                                         model_encoder=encoder, 
-                                         model_decoder=decoder, 
-                                         device=device)
+    df_test = get_training_data(config.IMAGE_ID_FILE_TEST, config.CAPTION_FILE)
     
-    print(f"Predicted caption: {pred_caption}")
+    image_ids = []
+    true_captions = []
+    pred_captions = []
+    for i in range(10):
+        image_id, caption = pick_random_test_image(df_test)
+        copy_file_to_correct_folder(image_id)
+        image_file = f"asset/test_image/{image_id}"
+        pred_caption = predict_image_caption(image_file, 
+                                             transform_image=transform_test, 
+                                             model_encoder=encoder, 
+                                             model_decoder=decoder, 
+                                             device=device)
+        image_ids.append(image_id)
+        true_captions.append(caption)
+        pred_captions.append(pred_caption)
+        
+    df_pred = pd.DataFrame({"IMAGE_ID": image_ids, 
+                            "TRUE_CAPTION": true_captions, 
+                            "PRED_CAPTION": pred_captions})
+    
+    df_pred.to_csv("model/predictions.csv", index=False)

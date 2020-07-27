@@ -27,6 +27,8 @@ clean-pyc:
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean: clean-pyc
+	rm asset/test_image/*.jpg
+	rm -rf asset/test_image/.ipynb_checkpoints
 
 format:
 	isort -rc -y .

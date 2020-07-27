@@ -15,6 +15,7 @@ import numpy as np
 import os
 import time
 from tqdm import tqdm
+import math
 
 if __name__ == "__main__":
     
@@ -92,6 +93,8 @@ if __name__ == "__main__":
 
     train_ppl_list = []
     val_ppl_list = []
+    
+    best_val_loss = math.inf 
     
     for epoch in tqdm_epochs:
         
@@ -203,13 +206,15 @@ if __name__ == "__main__":
 
         val_loss_list.append(avg_val_loss)
         val_ppl_list.append(avg_val_perplexity)
-                        
-        tqdm_epochs.set_description(f"EPOCH: Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}")        
+        
+        epoch_msg = f"EPOCH: Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}"                        
+        tqdm_epochs.set_description(epoch_msg)        
             
         # Save the weights.
-        if epoch % config.SAVE_EVERY == 0:
-            torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-{epoch}.pkl"))
-            torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder-{epoch}.pkl"))
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-checkpoint.pt"))
+            torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder-checkpoint.pt"))
 
     performance_plot(train_loss_list, 
                      val_loss_list, 
