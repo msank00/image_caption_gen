@@ -88,8 +88,8 @@ if __name__ == "__main__":
                                    mode='test')
 
     # TODO #2: Specify the saved models to load.
-    encoder_file = f"{config.MODEL_DIR}encoder-1.pkl"
-    decoder_file = f"{config.MODEL_DIR}decoder-1.pkl"
+    encoder_file = f"{config.MODEL_DIR}encoder-checkpoint.pt"
+    decoder_file = f"{config.MODEL_DIR}decoder-checkpoint.pt"
     
     assert os.path.exists(encoder_file), f"Encoder model: '{encoder_file}' doesn't not exist."
     assert os.path.exists(decoder_file), f"Decoder model: '{decoder_file}' doesn't not exist."
@@ -121,7 +121,8 @@ if __name__ == "__main__":
     image_ids = []
     true_captions = []
     pred_captions = []
-    for i in range(10):
+    for i in range(200):
+        print(i)
         image_id, caption = pick_random_test_image(df_test)
         copy_file_to_correct_folder(image_id)
         image_file = f"asset/test_image/{image_id}"
