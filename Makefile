@@ -89,6 +89,9 @@ prepare_model_dir:
 	mv *.zip model/
 	unzip 'model/*.zip'
 	rm model/*.zip
+	mv *.pkl model/
+	mv *.png model/
+	mv sample_new.txt model/
 	cp dataset-metadata.json model/
 
 	python3 update_meta_json.py
