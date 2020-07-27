@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
 
     old_time = time.time()
-    tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
+    # tqdm_epochs = tqdm(range(1, config.NUM_EPOCHS+1), desc="EPOCH:", leave=True)
 
     train_loss_list = []
     val_loss_list = []
@@ -96,16 +96,18 @@ if __name__ == "__main__":
     
     best_val_loss = math.inf 
     
-    for epoch in tqdm_epochs:
+    print("\n Start Training \n")
+    
+    for epoch in range(1, config.NUM_EPOCHS+1):
         
-        tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
+        # tqdm_train_steps = tqdm(range(1, total_train_step+1), desc='TRAIN BATCH:', leave=True)
         
         # TRAINING
         encoder.train()
         decoder.train()
         total_train_loss = 0.0
         total_train_perplexity = 0.0
-        for i_step in tqdm_train_steps:
+        for i_step in range(1, total_train_step+1):
                 
             if time.time() - old_time > 60:
                 old_time = time.time()
@@ -149,7 +151,9 @@ if __name__ == "__main__":
             train_perplexity = np.exp(train_loss)
             total_train_perplexity += train_perplexity
             
-            tqdm_train_steps.set_description(f"TRAIN BATCH: Loss: {np.round(train_loss,4)}, PPL: {np.round(train_perplexity, 4)}")
+            train_batch_msg = f"\tEpoch: [{epoch}/{config.NUM_EPOCHS}] | TRAIN BATCH steps: [{i_step}/{total_train_step}] |  Loss: {np.round(train_loss,4)}, PPL: {np.round(train_perplexity, 4)}"
+            # tqdm_train_steps.set_description(train_batch_msg)
+            print(train_batch_msg)
 
             if config.DEV_MODE:
                 if i_step == 5:
@@ -166,9 +170,9 @@ if __name__ == "__main__":
         decoder.eval()
         total_val_loss = 0.
         total_val_perplexity = 0.
-        tqdm_val_steps = tqdm(range(1, total_validation_step+1), desc='VAL BATCH:', leave=True)
+        # tqdm_val_steps = tqdm(range(1, total_validation_step+1), desc='VAL BATCH:', leave=True)
         with torch.no_grad():
-            for i_step in tqdm_val_steps:          
+            for i_step in range(1, total_validation_step+1):          
                 # Randomly sample a caption length, and sample indices with that length.
                 indices = val_data_loader.dataset.get_train_indices()
                 # Create and assign a batch sampler to retrieve a batch with the sampled indices.
@@ -194,7 +198,11 @@ if __name__ == "__main__":
                 val_perplexity = np.exp(val_loss)
                 total_val_perplexity += val_perplexity
                 
-                tqdm_val_steps.set_description(f"VAL BATCH: Loss: {np.round(val_loss,4)}, PPL: {np.round(val_perplexity, 4)}")
+                
+                
+                val_batch_msg = f"\tEpoch: [{epoch}/{config.NUM_EPOCHS}] | VAL BATCH steps: [{i_step}/{total_validation_step}] | Loss: {np.round(val_loss,4)}, PPL: {np.round(val_perplexity, 4)}"
+                # tqdm_val_steps.set_description()
+                print(val_batch_msg)
                 
                 if config.DEV_MODE:
                     if i_step == 5:
@@ -207,12 +215,14 @@ if __name__ == "__main__":
         val_loss_list.append(avg_val_loss)
         val_ppl_list.append(avg_val_perplexity)
         
-        epoch_msg = f"EPOCH: Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}"                        
-        tqdm_epochs.set_description(epoch_msg)        
+        epoch_msg = f"Epoch: [{epoch}/{config.NUM_EPOCHS}] | Train_loss: {np.round(avg_train_loss,4)}, Train_ppl: {np.round(avg_train_perplexity,4)}, Val_loss: {np.round(avg_val_loss,4)}, Val_ppl: {np.round(avg_val_perplexity, 4)}"                        
+        print(epoch_msg)
+        # tqdm_epochs.set_description(epoch_msg)        
             
         # Save the weights.
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
+            print(f"****** Saving Best model so far. Best val loss/epoch: {avg_val_loss} ******")
             torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-checkpoint.pt"))
             torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder-checkpoint.pt"))
 
