@@ -51,7 +51,7 @@ gpu-available:
 	# memory footprint support libraries/code
 	python3 99_available_gpu.py
 
-quick-push: clean-pyc
+quick-push:
 	git add .
 	git commit -m "Quick code push from colab"
 	git push
