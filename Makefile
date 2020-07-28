@@ -27,8 +27,8 @@ clean-pyc:
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean: clean-pyc
-	rm asset/test_image/*.jpg
 	rm -rf asset/test_image/.ipynb_checkpoints
+	rm asset/test_image/*.jpg
 
 format:
 	isort -rc -y .
@@ -78,19 +78,13 @@ prep-main-data:
 	mv data/flickr_data/Flickr_Data/Images/* data/images/
 
 prepare_model_dir:
-	# export KAGGLE_DATASET_ID="sankarshan7/msank-tweet-sentiment"
-
-	# kaggle datasets init -p output
-
-
-	# download previous models to keep the output directory in sync with kaggle
-	# else old files may get deleted in remote while pushing
 	kaggle datasets download sankarshan7/image-caption
 	mv *.zip model/
 	unzip 'model/*.zip'
 	rm model/*.zip
-	mv *.pkl model/
 	mv *.png model/
+	mv *.pt model/
+	mv predictions.csv model/
 	mv sample_new.txt model/
 	cp dataset-metadata.json model/
 

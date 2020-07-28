@@ -148,3 +148,5 @@ output/
 **/*.pth
 **/*.jpg
 **/*.pkl
+temp.py 
+debug/

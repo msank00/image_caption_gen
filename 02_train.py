@@ -223,8 +223,13 @@ if __name__ == "__main__":
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             print(f"****** Saving Best model so far. Best val loss/epoch: {avg_val_loss} ******")
-            torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder-checkpoint.pt"))
-            torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder-checkpoint.pt"))
+            if config.DEV_MODE:
+                file_suffix = f"-checkpoint-dev"
+            else:
+                file_suffix = f"-checkpoint"
+                
+            torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder{file_suffix}.pt"))
+            torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder{file_suffix}.pt"))
 
     performance_plot(train_loss_list, 
                      val_loss_list, 
