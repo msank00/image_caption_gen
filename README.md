@@ -51,7 +51,10 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
 7. [x] Prediction
 8. [ ] Model Debugging
    1. [ ] Debug Overfitting
-   2. [ ] Check training `input` + `label` order
+   2. [ ] Vary Learning Rate (learning rate scheduler)
+   3. [ ] Vary batch sampler/data loader
+   4. [ ] Vary batch size
+   5. [x] Check training `input` + `label` order
 9. [ ] Experiment tracker
 10. [ ] Serving
 11. [ ] Docker
