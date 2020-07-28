@@ -8,7 +8,7 @@ config:
     IMAGE_DATA_DIR: "data/images/"
     MODEL_DIR: "model/"
     DEV_MODE: False
-    BATCH_SIZE: 64
+    BATCH_SIZE: 32
     VOCAB_THRESHOLD: 5
     # dimensionality of image embedding 
     IMG_EMBED_SIZE: 300
@@ -16,12 +16,12 @@ config:
     WORD_EMBED_SIZE: 300
     # number of features in hidden state of the RNN decoder
     HIDDEN_SIZE: 512
-    NUM_EPOCHS: 10
+    NUM_EPOCHS: 12
     # determines frequency of saving model weights
     SAVE_EVERY: 1
     PRINT_EVERY: 5
     VERBOSE: True
     VOCAB_FILE: "output/vocab.pkl"
     VOCAB_FROM_FILE: False
-    DEV_MODE: True
+    DEV_MODE: False
 

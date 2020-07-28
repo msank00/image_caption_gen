@@ -60,4 +60,6 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
 11. [ ] Docker
 12. [ ] Deployment (Heroku)
 
+- add reproducibility
+
 -----------
