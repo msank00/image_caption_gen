@@ -116,7 +116,7 @@ if __name__ == "__main__":
     encoder.to(device)
     decoder.to(device)
     
-    df_test = get_training_data(config.IMAGE_ID_FILE_TRAIN, config.CAPTION_FILE)
+    df_test = get_training_data(config.IMAGE_ID_FILE_TEST, config.CAPTION_FILE)
     
     n = len(df_test)
 
@@ -144,4 +144,4 @@ if __name__ == "__main__":
                             "TRUE_CAPTION": true_captions, 
                             "PRED_CAPTION": pred_captions})
     
-    df_pred.to_csv("model/predictions_train_20200728.csv", index=False)
+    df_pred.to_csv("model/predictions_20200728_p3.csv", index=False)

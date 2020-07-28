@@ -233,13 +233,13 @@ if __name__ == "__main__":
 
     performance_plot(train_loss_list, 
                      val_loss_list, 
-                     outfile="asset/evaluation_plot/loss_plot.png",
+                     outfile="model/loss_plot.png",
                      title="Loss vs Epoch",
                      ylab="Avg. Batch Loss")
 
     performance_plot(train_ppl_list, 
                      val_ppl_list, 
-                     outfile="asset/evaluation_plot/ppl_plot.png",
+                     outfile="model/ppl_plot.png",
                      title="Perplpexity vs Epoch",
                      ylab="Avg. Batch Perplexity")
 
