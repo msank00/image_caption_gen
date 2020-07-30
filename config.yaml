@@ -1,7 +1,7 @@
 config:
     DATA_DIR: "data/main_caption_data/"
     CAPTION_DATA_DIR: "data/main_caption_data/"
-    CAPTION_FILE: "data/main_caption_data/Flickr8k_token_processed_small_caption_flat.csv"
+    CAPTION_FILE: "data/main_caption_data/Flickr8k_lemma_token_processed_all_caption_flat.csv"
     IMAGE_ID_FILE_TRAIN: "data/main_caption_data/Flickr_8k.trainImages.txt"
     IMAGE_ID_FILE_VAL: "data/main_caption_data/Flickr_8k.devImages.txt"
     IMAGE_ID_FILE_TEST: "data/main_caption_data/Flickr_8k.testImages.txt"

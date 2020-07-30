@@ -64,8 +64,9 @@ if __name__ == "__main__":
     # Initialize the encoder and decoder. 
     encoder = EncoderCNN(config.WORD_EMBED_SIZE)
     decoder = DecoderRNN(config.WORD_EMBED_SIZE, 
-                        config.HIDDEN_SIZE, 
-                        vocab_size)
+                         config.HIDDEN_SIZE, 
+                         vocab_size, 
+                         num_layers=2)
 
     # Move models to GPU if CUDA is available. 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

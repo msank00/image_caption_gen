@@ -58,7 +58,11 @@ def prepare_training_data(df: pd.DataFrame,
        and thus create a flat version of the input dataframe.
 
     """
-    assert mode in ["small_caption", "large_caption", "all_caption"], f"mode: '{mode}' must be one of ['small_caption', 'large_caption', 'all_caption']"
+    assert mode in ["small_caption", "large_caption", "all_caption_together", "all_caption_flat"], f"mode: '{mode}' must be one of ['small_caption', 'large_caption', 'all_caption']"
+
+    if mode == "all_caption_flat":
+        cols = ["IMAGE_ID", "CAPTION"]
+        return df[cols]
     
     grouped = df.groupby(["IMAGE_ID"])
     image_ids = []
@@ -68,15 +72,17 @@ def prepare_training_data(df: pd.DataFrame,
         
         all_captions = group.CAPTION.values.tolist()
         
-        if mode == "all_caption":
+        if mode == "all_caption_together":
             caption = " ".join(all_captions)
 
         if mode == "small_caption":
             caption = pick_small_caption(all_captions)
             
         if mode == "large_caption":
+            # caption = pick_large_caption(all_captions)
             raise NotImplmentedError
         
+
         image_ids.append(image_id)
         captions.append(caption)
 

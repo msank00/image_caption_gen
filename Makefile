@@ -72,6 +72,7 @@ prep-main-data:
 	mkdir -p data/main_caption_data
 	mkdir -p data/images
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr8k.token.txt data/main_caption_data/
+	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr8k.lemma.token.txt data/main_caption_data/
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.trainImages.txt data/main_caption_data/
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.testImages.txt data/main_caption_data/
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.devImages.txt data/main_caption_data/
