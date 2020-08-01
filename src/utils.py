@@ -10,7 +10,7 @@ import numpy as np
 def parse_config_file(config_file: str):
 
     with open(config_file) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.load(f) #, Loader=yaml.FullLoader)
 
     return config
 

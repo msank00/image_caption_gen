@@ -38,14 +38,14 @@ format:
 dataval:
 	streamlit run 01_check_data.py
 
+clean-data:
+	python3 00_clean_data.py
+
 train:
 	python3 02_train.py
 
 predict:
 	python3 03_prediction.py
-
-clean-data:
-	python3 00_clean_data.py
 
 gpu-available:
 	# memory footprint support libraries/code
@@ -85,12 +85,11 @@ prepare_model_dir:
 	rm model/*.zip
 	mv *.png model/
 	mv *.pt model/
-	mv predictions.csv model/
 	mv sample_new.txt model/
 	cp dataset-metadata.json model/
-
 	python3 update_meta_json.py
-	touch model/sample_new.txt
+
+set-data: data-download prep-main-data prepare_model_dir
 
 publish_output:
 	kaggle datasets version -p model -m "Updated data"

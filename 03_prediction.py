@@ -144,4 +144,4 @@ if __name__ == "__main__":
                             "TRUE_CAPTION": true_captions, 
                             "PRED_CAPTION": pred_captions})
     
-    df_pred.to_csv("model/predictions_20200728_p3.csv", index=False)
+    df_pred.to_csv("model/predictions_20200802.csv", index=False)
