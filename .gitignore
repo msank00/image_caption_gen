@@ -148,5 +148,6 @@ output/
 **/*.pth
 **/*.jpg
 **/*.pkl
+export.sh
 temp.py 
 debug/

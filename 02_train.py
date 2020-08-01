@@ -1,5 +1,6 @@
 import warnings
 warnings.simplefilter("ignore", category=DeprecationWarning)
+from comet_ml import Experiment
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -9,7 +10,7 @@ from src.loss import get_loss_function
 from src.optimizer import get_optimizer
 from src.evaluation import performance_plot
 import math
-from src.utils import Config
+from src.utils import Config, seed_everything
 import torch.utils.data as data
 import numpy as np
 import os
@@ -17,12 +18,36 @@ import time
 from tqdm import tqdm
 import math
 
+COMMET_ML_API_KEY = os.environ.get("COMMET_ML_API_KEY")
+experiment = Experiment(api_key=COMMET_ML_API_KEY, 
+                        project_name="image_caption_generation")
+
+print("Seed everything. Ensure reproducibility...")
+seed_everything(seed=42)
+
 if __name__ == "__main__":
     
 
     config = Config("config.yaml")
     if config.DEV_MODE:
         warnings.warn(f"Running in dev_mode: {config.DEV_MODE}")
+
+    # Move models to GPU if CUDA is available. 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    hyper_params = {
+        "device": str(device),
+        "epochs": config.NUM_EPOCHS,
+        "learning_rate": 1e-4,
+        "batch_size": config.BATCH_SIZE,
+        "vocab_threshold": config.VOCAB_THRESHOLD,
+        "image_embed_soze": config.IMG_EMBED_SIZE,
+        "word_embed_size": config.WORD_EMBED_SIZE,
+        "hidden_zise": config.HIDDEN_SIZE,
+        "dev_mode": config.DEV_MODE
+    }
+    experiment.log_parameters(hyper_params)
+
 
     # (Optional) TODO #2: Amend the image transform below.
     transform_train = transforms.Compose([ 
@@ -68,8 +93,7 @@ if __name__ == "__main__":
                          vocab_size, 
                          num_layers=2)
 
-    # Move models to GPU if CUDA is available. 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
     encoder.to(device)
     decoder.to(device)
 
@@ -77,7 +101,12 @@ if __name__ == "__main__":
 
     params = list(decoder.parameters()) + list(encoder.embed.parameters())
 
-    optimizer = get_optimizer(params, optim_type="adam", learning_rate=0.001) 
+    optimizer = get_optimizer(params, optim_type="adam", learning_rate=1e-4) 
+    
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", patience=5, factor=0.3, verbose=True
+    )
+
 
     # Set the total number of training steps per epoch.
     total_train_step = math.ceil(len(train_data_loader.dataset.caption_lengths) / train_data_loader.batch_sampler.batch_size)
@@ -98,6 +127,8 @@ if __name__ == "__main__":
     best_val_loss = math.inf 
     
     print("\n Start Training \n")
+    
+    step = 0
     
     for epoch in range(1, config.NUM_EPOCHS+1):
         
@@ -212,6 +243,8 @@ if __name__ == "__main__":
         # performance per epoch
         avg_val_loss = np.round(total_val_loss / total_validation_step,4)
         avg_val_perplexity = np.round(total_val_perplexity / total_validation_step,4)
+        
+        scheduler.step(avg_val_loss)
 
         val_loss_list.append(avg_val_loss)
         val_ppl_list.append(avg_val_perplexity)
@@ -231,18 +264,31 @@ if __name__ == "__main__":
                 
             torch.save(decoder.state_dict(), os.path.join(config.MODEL_DIR, f"decoder{file_suffix}.pt"))
             torch.save(encoder.state_dict(), os.path.join(config.MODEL_DIR, f"encoder{file_suffix}.pt"))
+            
+        step += 1
+        experiment.log_metric("train loss", avg_train_loss, step=step)
+        experiment.log_metric("train perplexity", avg_train_perplexity, step=step)
+        experiment.log_metric("val loss", avg_val_loss, step=step)
+        experiment.log_metric("val perplexity", avg_val_perplexity, step=step)
 
+
+    outfile_loss_plot = "model/loss_plot.png"
     performance_plot(train_loss_list, 
                      val_loss_list, 
-                     outfile="model/loss_plot.png",
+                     outfile=outfile_loss_plot,
                      title="Loss vs Epoch",
                      ylab="Avg. Batch Loss")
+    
+    experiment.log_image(outfile_loss_plot)
 
+    outfile_ppl_plot = "model/ppl_plot.png"
     performance_plot(train_ppl_list, 
                      val_ppl_list, 
-                     outfile="model/ppl_plot.png",
+                     outfile=outfile_ppl_plot,
                      title="Perplpexity vs Epoch",
                      ylab="Avg. Batch Perplexity")
+    
+    experiment.log_image(outfile_ppl_plot)
 
 
     print("done")
