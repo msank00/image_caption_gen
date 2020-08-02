@@ -28,7 +28,8 @@ class DecoderRNN(nn.Module):
                  embed_size:int, 
                  hidden_size:int, 
                  vocab_size:int, 
-                 num_layers:int = 1):
+                 num_layers:int = 1, 
+                 dropout:float = 0):
         super().__init__()
 
         self.embedding_layer = nn.Embedding(vocab_size, embed_size)
@@ -36,7 +37,8 @@ class DecoderRNN(nn.Module):
         self.lstm = nn.LSTM(input_size = embed_size, 
                             hidden_size = hidden_size,
                             num_layers = num_layers,
-                            batch_first = True)
+                            batch_first = True, 
+                            dropout = dropout)
         
         self.linear = nn.Linear(hidden_size, vocab_size)
         
