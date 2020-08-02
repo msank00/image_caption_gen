@@ -29,6 +29,18 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
 
 ![image](asset/demo.png)
 
+## :rocket: Train Model
+
+```py
+make train
+```
+
+## :rocket: Predict
+
+```py
+make predict
+```
+
 ## :lock: Track experement
 
 - Use [comet ml](https://www.comet.ml/site/)
@@ -43,10 +55,10 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
       1. [x] Check the LSTM syntaxt, pytorch documentation
 3. [x] Optimizer
 4. [x] Loss/objective function/criterion
-5. [ ] Add reproducibility
+5. [x] Add reproducibility
 6. [x] Train model
    1. [ ] Callbacks
-      1. [ ] Learning rate scheduler, ..plateaue
+      1. [x] Learning rate scheduler, ..plateaue
       2. [ ] Saving best model
 7. [ ] **Performance Evaluation**
    1. [ ] Add Sentence level **BLEU score** to compare true captions and predicted captions. [link](https://machinelearningmastery.com/calculate-bleu-score-for-text-python/)
@@ -56,18 +68,19 @@ This will create and open a simple [streamlit](https://www.streamlit.io/) **data
 9. [ ] **Model Debugging** :fire:
    1. Paper to follow:
       1. [Learning cnn lstm architecture for image caption generation Moses Soh](http://cs224d.stanford.edu/reports/msoh.pdf)
-         1. [ ] As per the paper, 2 LSTM with droupout (keep probability 0.75) work best for MSCOCO dataset
+         1. [x] As per the paper, 2 LSTM 
+         2. [ ] with droupout (keep probability 0.75) work best for MSCOCO dataset
    2. [Coping with Overfitting Problems of Image Caption](https://dacemirror.sci-hub.tw/proceedings-article/6c77b0141a839ab70bfd7c69ed07c4f8/luo2019.pdf?rand=5f218af6655f8?download=true)
    3. [ ] Debug Overfitting
    4. [ ] Vary Learning Rate (learning rate scheduler)
    5. [ ] Vary batch sampler/data loader
    6. [ ] Vary batch size
-   7. [ ] Add more LSTM layers in the Decoder 
-      1. [ ] Try Bi-directional
+   7. [x] Add more LSTM layers in the Decoder 
+      1. [x] Try Bi-directional
    8. [ ] Add dropout layer
    9. [ ] Add [word embedding](https://medium.com/@martinpella/how-to-use-pre-trained-word-embeddings-in-pytorch-71ca59249f76)
    10. [x] Check training `input` + `label` order
-10. [ ] Experiment tracker
+10. [x] Experiment tracker
 11. [ ] Serving
 12. [ ] Docker
 13. [ ] Deployment (Heroku)

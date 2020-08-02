@@ -2,20 +2,24 @@ project-template:
 	mkdir -p data
 	mkdir -p model
 	mkdir -p output
-	mkdir /root/.kaggle
-	cp kaggle.json /root/.kaggle/
-	chmod 600 /root/.kaggle/kaggle.json
-
+	
 env:
 	pip3 install -r requirements.txt
 	python3 -c "import nltk; nltk.download('punkt')"
 	apt-get install htop
 
+kaggle-api:
+	mkdir /root/.kaggle
+	python3 98_prepare_kaggle_key.py
+	mv kaggle.json /root/.kaggle/
+	chmod 600 /root/.kaggle/kaggle.json
+
+
 git-config:
 	git config user.email "sankarshan7@gmail.com"
 	git config user.name "Sankarshan Mridha"
 
-quick-setup: project-template env git-config
+
 
 clean-log:
 	rm **/*.log
@@ -29,6 +33,9 @@ clean-pyc:
 clean: clean-pyc
 	rm -rf asset/test_image/.ipynb_checkpoints
 	rm asset/test_image/*.jpg
+	rm -rf .mypy_cache
+	rm -rf .ipynb_checkpoints
+	rm -rf src/.ipynb_checkpoints
 
 format:
 	isort -rc -y .
@@ -78,7 +85,7 @@ prep-main-data:
 	cp data/flickr_data/Flickr_Data/Flickr_TextData/Flickr_8k.devImages.txt data/main_caption_data/
 	mv data/flickr_data/Flickr_Data/Images/* data/images/
 
-prepare_model_dir:
+prepare-model-dir:
 	kaggle datasets download sankarshan7/image-caption
 	mv *.zip model/
 	unzip 'model/*.zip'
@@ -87,9 +94,16 @@ prepare_model_dir:
 	mv *.pt model/
 	mv sample_new.txt model/
 	cp dataset-metadata.json model/
-	python3 update_meta_json.py
+	python3 97_update_meta_json.py
 
-set-data: data-download prep-main-data prepare_model_dir
+
 
 publish_output:
 	kaggle datasets version -p model -m "Updated data"
+
+
+quick-setup: project-template kaggle-api env git-config
+
+set-data: data-download prep-main-data prepare-model-dir
+
+pipeline: clean-data train predict publish_output
