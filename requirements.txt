@@ -8,3 +8,4 @@ isort
 gputil
 psutil
 humanize
+comet-ml

@@ -98,7 +98,7 @@ prepare-model-dir:
 
 
 
-publish_output:
+publish-output:
 	kaggle datasets version -p model -m "Updated data"
 
 
@@ -106,4 +106,4 @@ quick-setup: project-template kaggle-api env git-config
 
 set-data: data-download prep-main-data prepare-model-dir
 
-pipeline: clean-data train predict publish_output
+pipeline: clean-data train predict publish-output
