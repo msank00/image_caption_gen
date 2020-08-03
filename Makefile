@@ -94,6 +94,7 @@ prepare-model-dir:
 	mv *.pt model/
 	mv sample_new.txt model/
 	cp dataset-metadata.json model/
+	mv prediction*.csv model/
 	python3 97_update_meta_json.py
 
 
