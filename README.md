@@ -59,7 +59,7 @@ make predict
 6. [x] Train model
    1. [ ] Callbacks
       1. [x] Learning rate scheduler, ..plateaue
-      2. [ ] Saving best model
+      2. [x] Saving best model
 7. [ ] **Performance Evaluation**
    1. [ ] Add Sentence level **BLEU score** to compare true captions and predicted captions. [link](https://machinelearningmastery.com/calculate-bleu-score-for-text-python/)
    2. [ ] [METEOR Score](https://www.nltk.org/api/nltk.translate.html) Metric for Evaluation of Translation with Explicit ORdering:  
@@ -71,19 +71,52 @@ make predict
          1. [x] As per the paper, 2 LSTM 
          2. [x] with [droupout](https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/) (keep probability 0.75) work best for MSCOCO dataset
    2. [Coping with Overfitting Problems of Image Caption](https://dacemirror.sci-hub.tw/proceedings-article/6c77b0141a839ab70bfd7c69ed07c4f8/luo2019.pdf?rand=5f218af6655f8?download=true)
-   3. [ ] Debug Overfitting
-   4. [ ] Vary Learning Rate ([pytorch learning rate scheduler](https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate))
-   5. [ ] Vary batch sampler/data loader
-   6. [ ] Vary batch size
-   7. [x] Add more LSTM layers in the Decoder 
+   3. [x] Debug Overfitting
+   4. [x] :rocket: **Debug Decoder:** It seems the main issue is the decoder. This [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) helped a lot to understand the nuances properly. And finally meaningful captions started to generate.
+   5. [x] Vary Learning Rate ([pytorch learning rate scheduler](https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate))
+   6. [ ] When to use `softmax()` and relation with loss function
+   7. [ ] Vary batch sampler/data loader
+   8. [ ] Vary batch size
+   9. [x] Add more LSTM layers in the Decoder 
       1. [x] Try Bi-directional
-   8. [x] Add dropout layer
-   9. [ ] Add [word embedding](https://medium.com/@martinpella/how-to-use-pre-trained-word-embeddings-in-pytorch-71ca59249f76)
-   10. [x] Check training `input` + `label` order
+   10. [x] Add dropout layer
+   11. [ ] Add [word embedding](https://medium.com/@martinpella/how-to-use-pre-trained-word-embeddings-in-pytorch-71ca59249f76)
+   12. [x] Check training `input` + `label` order
 10. [x] Experiment tracker
 11. [ ] Serving
 12. [ ] Docker
 13. [ ] Deployment (Heroku)
+
+## Learning
+
+The decodre part is tricky. Initially I was using the `nn.LSTM()` which actually trains in bulk, i.e small lstm cells [blue boxes in the below image] are already packed based on cofiguration [refer below image]. This was causing issues while doing prediction. Somehow, I was missing the connection of how does it make sure that `hidden_sate` and `cell_sate` 
+at time `t-1` are fed at next time step `t`, i.e, following the definition of the traditional `LSTM`. May be it can be done using the `nn.LSTM()` module. But I was unable to do it. And due to this, during the initial training days, the otuput captions were not making senses. 
+
+**LSTM Implementation in PyTorch**
+
+![image](https://i.stack.imgur.com/SjnTl.png)
+
+After going through this [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) I realized that I should use the basics of LSTM and generate word one at a time in a loop following the principle of LSTM definition. So in the Decoder `nn.LSTMCell()` is used, which is the building block of `nn.LSTM()` module. And generated caption using `nn.LSTMCell()` in a loop and finally predicted captions start to make sense. Using `nn.LSTMCell()` is like using one blue box at a time for each time steps. 
+
+Great learning !!
+
+### How to interpret the pytorch LSTM module?
+
+It really depends on a model you use and how you will interpret the model. Output may be:
+
+- a single LSTM cell hidden state
+- several LSTM cell hidden states
+- all the hidden states outputs
+
+Output, is _almost never interpreted directly_. If the input is encoded there should be a softmax layer to decode the results.
+
+Note: In language modeling hidden states are used to define the probability of the next word, p(wt+1|w1,...,wt) =softmax(Wht+b).
+
+
+**Reference:**
+
+- [What's the difference between “hidden” and “output” in PyTorch LSTM?](https://stackoverflow.com/questions/48302810/whats-the-difference-between-hidden-and-output-in-pytorch-lstm) :fire:
+ 
 
 ----
 
