@@ -130,17 +130,17 @@ if __name__ == "__main__":
     
     df_test = get_training_data(config.IMAGE_ID_FILE_TEST, config.CAPTION_FILE)
     
-    n = 20 # len(df_test)
+    n = len(df_test)
 
     image_ids = []
     true_captions = []
     pred_captions = []
     for i in range(n):
         print(i)
-        image_id, caption = pick_random_test_image(df_test)
+        # image_id, caption = pick_random_test_image(df_test)
         
-        # image_id = df_test.iloc[i]["IMAGE_ID"]
-        # caption = df_test.iloc[i]["CAPTION"]
+        image_id = df_test.iloc[i]["IMAGE_ID"]
+        caption = df_test.iloc[i]["CAPTION"]
 
         copy_file_to_correct_folder(image_id)
         image_file = f"asset/test_image/{image_id}"
