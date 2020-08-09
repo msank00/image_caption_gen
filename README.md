@@ -90,13 +90,13 @@ make predict
 ## Learning
 
 The decodre part is tricky. Initially I was using the `nn.LSTM()` which actually trains in bulk, i.e small lstm cells [blue boxes in the below image] are already packed based on cofiguration [refer below image]. This was causing issues while doing prediction. Somehow, I was missing the connection of how does it make sure that `hidden_sate` and `cell_sate` 
-at time `t-1` are fed at next time step `t`, i.e, following the definition of the traditional `LSTM`. May be it can be done using the `nn.LSTM()` module. But I was unable to do it. And due to this, during the initial training days, the otuput captions were not making senses. 
+at time `t-1` are fed at next time step `t`, i.e, following the definition of the traditional `LSTM`. May be it can be done using the `nn.LSTM()` module. But I was unable to do it. And due to this, during the initial training days, the output captions were not making senses. 
 
 **LSTM Implementation in PyTorch**
 
 ![image](https://i.stack.imgur.com/SjnTl.png)
 
-After going through this [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) I realized that I should use the basics of LSTM and generate word one at a time in a loop following the principle of LSTM definition. So in the Decoder `nn.LSTMCell()` is used, which is the building block of `nn.LSTM()` module. And generated caption using `nn.LSTMCell()` in a loop and finally predicted captions start to make sense. Using `nn.LSTMCell()` is like using one blue box at a time for each time steps. 
+After going through this [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) it's understood that basics of LSTM should be used for validation of understanding the concept and generate word one at a time in a loop following the principle of LSTM definition. So in the update Decoder, `nn.LSTMCell()` [blue boxes] is used, which is the building block of `nn.LSTM()` module. And captions are generated using `nn.LSTMCell()` in a loop and finally predicted captions start to make sense. Using `nn.LSTMCell()` is like using one blue box at a time for each time steps. 
 
 Great learning !!
 
