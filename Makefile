@@ -94,11 +94,12 @@ prepare-model-dir:
 	mv *.pt model/
 	mv sample_new.txt model/
 	cp dataset-metadata.json model/
+	mv prediction*.csv model/
 	python3 97_update_meta_json.py
 
 
 
-publish_output:
+publish-output:
 	kaggle datasets version -p model -m "Updated data"
 
 
@@ -106,4 +107,4 @@ quick-setup: project-template kaggle-api env git-config
 
 set-data: data-download prep-main-data prepare-model-dir
 
-pipeline: clean-data train predict publish_output
+pipeline: clean-data train predict publish-output
