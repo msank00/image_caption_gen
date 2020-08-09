@@ -91,7 +91,8 @@ if __name__ == "__main__":
     decoder = DecoderRNNUpdated(config.WORD_EMBED_SIZE, 
                                 config.HIDDEN_SIZE, 
                                 vocab_size, 
-                                num_layers=2)
+                                num_layers=2, 
+                                device = device)
 
     
     encoder.to(device)

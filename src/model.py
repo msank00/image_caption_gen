@@ -89,6 +89,7 @@ class DecoderRNNUpdated(nn.Module):
                  embed_size:int, 
                  hidden_size:int, 
                  vocab_size:int, 
+                 device, 
                  num_layers:int = 1, 
                  dropout:float = 0):
         super().__init__()
@@ -97,6 +98,7 @@ class DecoderRNNUpdated(nn.Module):
         self.embed_size = embed_size
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
+        self.device = device
 
         self.embedding_layer = nn.Embedding(num_embeddings=self.vocab_size, 
                                             embedding_dim=self.embed_size)
@@ -116,11 +118,11 @@ class DecoderRNNUpdated(nn.Module):
         batch_size = features.size(0)
         
         # init the hidden and cell states to zeros
-        hidden_state = torch.zeros((batch_size, self.hidden_size))
-        cell_state = torch.zeros((batch_size,self.hidden_size))
+        hidden_state = torch.zeros((batch_size, self.hidden_size)).to(self.device)
+        cell_state = torch.zeros((batch_size,self.hidden_size)).to(self.device)
         
         # define the output tensor placeholder
-        outputs = torch.empty((batch_size, captions.size(1), self.vocab_size)) #.cuda()
+        outputs = torch.empty((batch_size, captions.size(1), self.vocab_size)).to(self.device)  #.cuda()
         
         # embed the captions
         
@@ -171,8 +173,8 @@ class DecoderRNNUpdated(nn.Module):
         :type max_len: int, optional
         """
         batch_size = 1
-        hidden_state = torch.zeros((batch_size, self.hidden_size))
-        cell_state = torch.zeros((batch_size,self.hidden_size))
+        hidden_state = torch.zeros((batch_size, self.hidden_size)).to(self.device)
+        cell_state = torch.zeros((batch_size,self.hidden_size)).to(self.device)
         
         output_sentence = []
         inputs = inputs.squeeze(dim=0)

@@ -9,7 +9,7 @@ env:
 	apt-get install htop
 
 kaggle-api:
-	mkdir /root/.kaggle
+	mkdir -p /root/.kaggle
 	python3 98_prepare_kaggle_key.py
 	mv kaggle.json /root/.kaggle/
 	chmod 600 /root/.kaggle/kaggle.json
