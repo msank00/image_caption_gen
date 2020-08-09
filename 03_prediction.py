@@ -110,7 +110,10 @@ if __name__ == "__main__":
     # decoder = DecoderRNN(embed_size, hidden_size, vocab_size)
     
     # DecoderRNNUpdated
-    decoder = DecoderRNNUpdated(embed_size, hidden_size, vocab_size)
+    decoder = DecoderRNNUpdated(embed_size, 
+                                hidden_size, 
+                                vocab_size, 
+                                device = device)
 
     # Load the trained weights.
     # map location helps in save and load accross devices (gpu/cpu)
