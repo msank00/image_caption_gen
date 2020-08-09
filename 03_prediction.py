@@ -6,7 +6,7 @@ from PIL import Image
 
 import os
 import torch
-from src.model import EncoderCNN, DecoderRNN
+from src.model import EncoderCNN, DecoderRNN, DecoderRNNUpdated
 
 import numpy as np
 import pandas as pd 
@@ -88,8 +88,14 @@ if __name__ == "__main__":
                                    mode='test')
 
     # TODO #2: Specify the saved models to load.
-    encoder_file = f"{config.MODEL_DIR}encoder-checkpoint.pt"
-    decoder_file = f"{config.MODEL_DIR}decoder-checkpoint.pt"
+    print(f"DEV MODE: {config.DEV_MODE}")
+    if config.DEV_MODE:
+        print("Loading dev model....")
+        encoder_file = f"{config.MODEL_DIR}encoder-checkpoint-dev.pt"
+        decoder_file = f"{config.MODEL_DIR}decoder-checkpoint-dev.pt"
+    else:
+        encoder_file = f"{config.MODEL_DIR}encoder-checkpoint.pt"
+        decoder_file = f"{config.MODEL_DIR}decoder-checkpoint.pt"
     
     assert os.path.exists(encoder_file), f"Encoder model: '{encoder_file}' doesn't not exist."
     assert os.path.exists(decoder_file), f"Decoder model: '{decoder_file}' doesn't not exist."
@@ -101,7 +107,10 @@ if __name__ == "__main__":
 
     # Initialize the encoder and decoder, and set each to inference mode.
     encoder = EncoderCNN(embed_size)
-    decoder = DecoderRNN(embed_size, hidden_size, vocab_size)
+    # decoder = DecoderRNN(embed_size, hidden_size, vocab_size)
+    
+    # DecoderRNNUpdated
+    decoder = DecoderRNNUpdated(embed_size, hidden_size, vocab_size)
 
     # Load the trained weights.
     # map location helps in save and load accross devices (gpu/cpu)
@@ -118,16 +127,17 @@ if __name__ == "__main__":
     
     df_test = get_training_data(config.IMAGE_ID_FILE_TEST, config.CAPTION_FILE)
     
-    n = len(df_test)
+    n = 20 # len(df_test)
 
     image_ids = []
     true_captions = []
     pred_captions = []
     for i in range(n):
         print(i)
-        # image_id, caption = pick_random_test_image(df_test)
-        image_id = df_test.iloc[i]["IMAGE_ID"]
-        caption = df_test.iloc[i]["CAPTION"]
+        image_id, caption = pick_random_test_image(df_test)
+        
+        # image_id = df_test.iloc[i]["IMAGE_ID"]
+        # caption = df_test.iloc[i]["CAPTION"]
 
         copy_file_to_correct_folder(image_id)
         image_file = f"asset/test_image/{image_id}"
@@ -144,4 +154,4 @@ if __name__ == "__main__":
                             "TRUE_CAPTION": true_captions, 
                             "PRED_CAPTION": pred_captions})
     
-    df_pred.to_csv("model/predictions_20200802.csv", index=False)
+    df_pred.to_csv("model/predictions_20200809.csv", index=False)

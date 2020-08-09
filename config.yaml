@@ -22,5 +22,5 @@ config:
     VERBOSE: True
     VOCAB_FILE: "output/vocab.pkl"
     VOCAB_FROM_FILE: False
-    DEV_MODE: False
+    DEV_MODE: True
 
