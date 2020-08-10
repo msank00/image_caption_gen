@@ -54,6 +54,9 @@ train:
 predict:
 	python3 03_prediction.py
 
+prediction-check:
+	streamlit run 04_check_prediction.py
+
 gpu-available:
 	# memory footprint support libraries/code
 	python3 99_available_gpu.py
