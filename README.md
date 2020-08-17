@@ -28,7 +28,7 @@ Many helper functions are given in the makefile, which may not be needed directl
 make clean-data
 ```
 
-This will generate a processed caption file (`.csv`). This filepath needs to be set in config file under the key `CAPTION_FILE`. This will be used in training the model. 
+This will generate a processed caption file (`.csv`). This filepath needs to be set in config file under the key `CAPTION_FILE`. This file will be used while training the model. 
 
 ### :chart_with_upwards_trend: Data Validation
 
@@ -72,13 +72,56 @@ This returns a csv file like this which helps to understand the prediction quial
 
 1. To predict on single image please use the Notebook 
 
-_add inference notebook_ [TODO]
+- [ ] _add inference notebook_ [TODO]
 
 ### :lock: Track experiment
 
 This is an iterative work and needs mutiple experiment to finetune the result. Therefore it's better to user `experiment tracker`.   
 
 - This project uses [comet ml](https://www.comet.ml/site/)
+
+----
+
+## Learning
+
+The `decoder` part is tricky. Initially the `nn.LSTM()` [[link](https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html#torch.nn.LSTM)] was used, which actually trains in bulk, i.e small `nn.LSTMCell()` [[link](https://pytorch.org/docs/stable/generated/torch.nn.LSTMCell.html#torch.nn.LSTMCell)] [blue boxes in the below image] are `stacked` based on cofiguration. This was causing issues during prediction.
+
+Somehow, couldn't follow how does `nn.LSTM()` make sure that `hidden_sate` and `cell_sate` 
+at time `t-1` are fed at next time step `t`, i.e, the recurrent behavior. May be it can be done using the `nn.LSTM()` module, but was unable to do it. So, during the initial training days, the output captions were not making senses. 
+
+**LSTM Implementation in PyTorch**
+
+![image](https://i.stack.imgur.com/SjnTl.png)
+
+This [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) helps to understand the nuances of decoder in a clear manner and helps to understand how to use `nn.LSTMCell()`.
+
+So in the updated Decoder, `nn.LSTMCell()` [blue boxes] is used, which acts as a single RNN cell - building block of `nn.LSTM()` module. This gives better control over the decoder - helps in debugging as well. Captions are generated using `nn.LSTMCell()` in a loop and predicted captions start to make sense finally. Using `nn.LSTMCell()` is like using one blue box at a time. 
+
+Great learning !!
+
+### How to interpret the pytorch LSTM module?
+
+It really depends on a model you use and how you will interpret the model. Output may be:
+
+- a single LSTM cell hidden state
+- several LSTM cell hidden states
+- all the hidden states outputs
+
+Output, is _almost never interpreted directly_. If the input is encoded there should be a `softmax layer` to decode the results.
+
+Note: In language modeling hidden states are used to define the probability of the next word, p(wt+1|w1,...,wt) =softmax(Wht+b).
+
+
+
+**Reference:**
+ 
+- [blog](https://towardsdatascience.com/automatic-image-captioning-with-cnn-rnn-aae3cd442d83)
+- [Github](https://github.com/Noob-can-Compile/Automatic-Image-Captioning)
+- [Create Vocabulary in NLP tasks](https://www.kdnuggets.com/2019/11/create-vocabulary-nlp-tasks-python.html)
+- [What's the difference between “hidden” and “output” in PyTorch LSTM?](https://stackoverflow.com/questions/48302810/whats-the-difference-between-hidden-and-output-in-pytorch-lstm) :fire:
+
+
+----
 
 ### :dart: TODO:
 
@@ -124,41 +167,6 @@ While developing it, many things go wrong. And a systematic approach needs to be
 11. [ ] Serving/ Simple web UI
 12. [ ] Docker
 13. [ ] Deployment (Heroku)
-
-## Learning
-
-The `decoder` part is tricky. Initially I was using the `nn.LSTM()` which actually trains in bulk, i.e small lstm cells [blue boxes in the below image] are already packed based on cofiguration [refer below image]. This was causing issues while doing prediction. Somehow, I was missing the connection of how does it make sure that `hidden_sate` and `cell_sate` 
-at time `t-1` are fed at next time step `t`, i.e, following the definition of the traditional `LSTM`. May be it can be done using the `nn.LSTM()` module. But I was unable to do it. And due to this, during the initial training days, the output captions were not making senses. 
-
-**LSTM Implementation in PyTorch**
-
-![image](https://i.stack.imgur.com/SjnTl.png)
-
-After going through this [blog](https://medium.com/@stepanulyanin/captioning-images-with-pytorch-bc592e5fd1a3) it's understood that basics of LSTM should be used for validation of understanding the concept and generate word one at a time in a loop following the principle of LSTM definition. So in the update Decoder, `nn.LSTMCell()` [blue boxes] is used, which is the building block of `nn.LSTM()` module. And captions are generated using `nn.LSTMCell()` in a loop and finally predicted captions start to make sense. Using `nn.LSTMCell()` is like using one blue box at a time for each time steps. 
-
-Great learning !!
-
-### How to interpret the pytorch LSTM module?
-
-It really depends on a model you use and how you will interpret the model. Output may be:
-
-- a single LSTM cell hidden state
-- several LSTM cell hidden states
-- all the hidden states outputs
-
-Output, is _almost never interpreted directly_. If the input is encoded there should be a softmax layer to decode the results.
-
-Note: In language modeling hidden states are used to define the probability of the next word, p(wt+1|w1,...,wt) =softmax(Wht+b).
-
-
-
-**Reference:**
- 
-- [blog](https://towardsdatascience.com/automatic-image-captioning-with-cnn-rnn-aae3cd442d83)
-- [Github](https://github.com/Noob-can-Compile/Automatic-Image-Captioning)
-- [Create Vocabulary in NLP tasks](https://www.kdnuggets.com/2019/11/create-vocabulary-nlp-tasks-python.html)
-- [What's the difference between “hidden” and “output” in PyTorch LSTM?](https://stackoverflow.com/questions/48302810/whats-the-difference-between-hidden-and-output-in-pytorch-lstm) :fire:
-
 
 ----
 

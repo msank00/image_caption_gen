@@ -13,21 +13,17 @@ from src.utils import Config
 
 def init_streamlit():
 
-    st.title("Image Caption Generation Task")
-    st.header("Data Validation")
-    st.subheader("Showing random sample from data")
+    st.title("Image Caption Generation")
+    st.header("Training Data Validation")
+    st.subheader("Showing random samples from training data")
 
 
 if __name__ == "__main__":
 
     config = Config("config.yaml")
-    # config.set_attribute()
 
-    # filename = f"{config.DATA_DIR}/flickr_caption_data_processed/Flickr8k_token_processed.csv"
     filename = f"{config.CAPTION_FILE}"
     df = pd.read_csv(filename, sep="\t")
-
-    # get_sample_data_from_clean_flat(df_flat)
 
     init_streamlit()
 
@@ -39,14 +35,13 @@ if __name__ == "__main__":
 
         image = Image.open(image_file)
 
-        st.markdown("## :rocket: Caption")
-        st.text_area(label="", value=caption)
-        st.markdown(f"## :camera: {image_name}")
+        st.markdown(f":rocket: **True Caption:** `{caption}`")
+        st.markdown(f":camera: Image file: `{image_name}`")
 
         st.image(image, use_column_width=True)
 
         st.markdown("----")
 
-    st.markdown("## :santa: FINISH")
+    st.markdown("### :santa: FINISH")
 
     print("DONE")
