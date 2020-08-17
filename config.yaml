@@ -20,7 +20,7 @@ config:
     SAVE_EVERY: 1
     PRINT_EVERY: 5
     VERBOSE: True
-    VOCAB_FILE: "output/vocab.pkl"
+    VOCAB_FILE: "model/vocab.pkl"
     VOCAB_FROM_FILE: False
     DEV_MODE: False
 
