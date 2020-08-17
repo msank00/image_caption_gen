@@ -1,31 +1,33 @@
 import os
+import random
 
+import numpy as np
+import pandas as pd
 import torch
 import yaml
-import pandas as pd
-import random
-import numpy as np
 
 
 def parse_config_file(config_file: str):
 
     with open(config_file) as f:
-        config = yaml.load(f) #, Loader=yaml.FullLoader)
+        config = yaml.load(f)  # , Loader=yaml.FullLoader)
 
     return config
 
-def seed_everything(seed:int=42):
+
+def seed_everything(seed: int = 42):
     # https://pytorch.org/docs/stable/notes/randomness.html
     random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    
+
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         torch.cuda.manual_seed_all(seed)
+
 
 class Config:
     def __init__(self, filename: str):
@@ -52,7 +54,6 @@ class Config:
         self.VOCAB_FILE = self.config["config"]["VOCAB_FILE"]
         self.VOCAB_FROM_FILE = self.config["config"]["VOCAB_FROM_FILE"]
         self.DEV_MODE = self.config["config"]["DEV_MODE"]
-        
 
     def __str__(self):
         return f"{self.config}"
@@ -77,7 +78,7 @@ def get_training_data(image_id_file: str, caption_file: str):
     df_train = pd.merge(
         df_train_ids, df_full_data, how="left", on=["IMAGE_ID"]
     )
-    
+
     df_train = df_train.sample(frac=1).reset_index(drop=True)
     return df_train
 

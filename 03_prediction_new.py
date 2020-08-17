@@ -23,8 +23,7 @@ def copy_file_to_correct_folder(image_id: str):
     file_src_path = f"{config.IMAGE_DATA_DIR}{image_id}"
     file_destination_path = f"asset/test_image/{image_id}"
     shutil.copy(file_src_path, file_destination_path)
-
-
+    
 def predict_image_caption(
     image_file: str,
     transform_image: transforms,
@@ -103,6 +102,7 @@ if __name__ == "__main__":
         encoder_file = f"{config.MODEL_DIR}encoder-checkpoint-dev.pt"
         decoder_file = f"{config.MODEL_DIR}decoder-checkpoint-dev.pt"
     else:
+        print("Model loaded...")
         encoder_file = f"{config.MODEL_DIR}encoder-checkpoint.pt"
         decoder_file = f"{config.MODEL_DIR}decoder-checkpoint.pt"
 
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # TODO #3: Select appropriate values for the Python variables below.
     embed_size = config.IMG_EMBED_SIZE
     hidden_size = config.HIDDEN_SIZE
-    vocab_size = len(test_data_loader.dataset.vocab)
+    vocab_size = 2022 #len(test_data_loader.dataset.vocab)
 
     # Initialize the encoder and decoder, and set each to inference mode.
     encoder = EncoderCNN(embed_size)
@@ -133,8 +133,12 @@ if __name__ == "__main__":
         torch.load(encoder_file, map_location=device), strict=False
     )
     decoder.load_state_dict(
-        torch.load(decoder_file, map_location=device), strict=False
+       torch.load(decoder_file, map_location=device), strict=False
     )
+    
+    # torch.load(decoder_file, map_location=device)
+    # torch.load('my_file.pt', map_location=lambda storage, loc: storage)
+    
     encoder.eval()
     decoder.eval()
 
@@ -146,7 +150,7 @@ if __name__ == "__main__":
 
     df_test = get_training_data(config.IMAGE_ID_FILE_TEST, config.CAPTION_FILE)
 
-    n = len(df_test)
+    n = 10 #len(df_test)
 
     image_ids = []
     true_captions = []
@@ -179,4 +183,4 @@ if __name__ == "__main__":
         }
     )
 
-    df_pred.to_csv("model/predictions_20200809.csv", index=False)
+    df_pred.to_csv("model/predictions_20200817.csv", index=False)

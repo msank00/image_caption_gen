@@ -11,7 +11,6 @@ from src.data_validation import (
 from src.utils import Config
 
 
-
 def pick_random_sample(df: pd.DataFrame):
     df_sample = df.sample(n=1)
 
@@ -20,6 +19,7 @@ def pick_random_sample(df: pd.DataFrame):
     pred_caption = df_sample.iloc[0]["PRED_CAPTION"]
 
     return image_id, true_caption, pred_caption
+
 
 def init_streamlit():
 

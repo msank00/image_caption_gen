@@ -1,12 +1,14 @@
+import numpy as np
 import pandas as pd
-import numpy as np 
 from tqdm import tqdm
+
 
 def pick_small_caption(all_captions: list):
 
     cap_len = list(map(lambda x: len(x.split(" ")), all_captions))
     min_index = np.argmin(cap_len, axis=0)
-    return all_captions[min_index]   
+    return all_captions[min_index]
+
 
 def process_data(filename: str, dev_mode=False):
 
@@ -49,39 +51,43 @@ def process_data(filename: str, dev_mode=False):
     return df
 
 
-def prepare_training_data(df: pd.DataFrame,
-                          mode: str = "small_caption",
-                          dev_mode: bool = False):
+def prepare_training_data(
+    df: pd.DataFrame, mode: str = "small_caption", dev_mode: bool = False
+):
 
     """Create training dataset where each row contains 
        image id and all the captions concatenated in a single string
        and thus create a flat version of the input dataframe.
 
     """
-    assert mode in ["small_caption", "large_caption", "all_caption_together", "all_caption_flat"], f"mode: '{mode}' must be one of ['small_caption', 'large_caption', 'all_caption']"
+    assert mode in [
+        "small_caption",
+        "large_caption",
+        "all_caption_together",
+        "all_caption_flat",
+    ], f"mode: '{mode}' must be one of ['small_caption', 'large_caption', 'all_caption']"
 
     if mode == "all_caption_flat":
         cols = ["IMAGE_ID", "CAPTION"]
         return df[cols]
-    
+
     grouped = df.groupby(["IMAGE_ID"])
     image_ids = []
     captions = []
 
     for i, (image_id, group) in tqdm(enumerate(grouped), total=len(grouped)):
-        
+
         all_captions = group.CAPTION.values.tolist()
-        
+
         if mode == "all_caption_together":
             caption = " ".join(all_captions)
 
         if mode == "small_caption":
             caption = pick_small_caption(all_captions)
-            
+
         if mode == "large_caption":
             # caption = pick_large_caption(all_captions)
             raise NotImplmentedError
-        
 
         image_ids.append(image_id)
         captions.append(caption)
@@ -93,5 +99,3 @@ def prepare_training_data(df: pd.DataFrame,
     df = pd.DataFrame({"IMAGE_ID": image_ids, "CAPTION": captions,})
 
     return df
-
-
