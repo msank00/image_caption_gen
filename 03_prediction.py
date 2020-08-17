@@ -93,6 +93,7 @@ if __name__ == "__main__":
         image_id_file=config.IMAGE_ID_FILE_TEST,
         image_folder=config.IMAGE_DATA_DIR,
         config=config,
+        vocab_file=config.VOCAB_FILE,
         mode="test",
     )
 
@@ -179,4 +180,4 @@ if __name__ == "__main__":
         }
     )
 
-    df_pred.to_csv("model/predictions_20200809.csv", index=False)
+    df_pred.to_csv("model/predictions_20200817.csv", index=False)
