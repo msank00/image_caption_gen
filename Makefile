@@ -98,7 +98,8 @@ prepare-model-dir:
 	rm model/*.zip
 	mv *.png model/
 	mv *.pt model/
-	cp dataset-metadata.json model/
+	python3 96_prepare_dataset_metadata.py
+	mv dataset-metadata.json model/
 	mv prediction*.csv model/
 	mv vocab.pkl model/
 	python3 97_update_meta_json.py
