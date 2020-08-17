@@ -45,7 +45,7 @@ format:
 	black -l 79 .
 
 
-dataval:
+datavalidation:
 	streamlit run 01_check_data.py
 
 clean-data:
