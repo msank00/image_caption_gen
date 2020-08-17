@@ -1,24 +1,26 @@
+from comet_ml import Experiment
+
 import math
 import os
 import time
 import warnings
+warnings.simplefilter("ignore", category=DeprecationWarning)
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.utils.data as data
-from comet_ml import Experiment
 from torchvision import transforms
 from tqdm import tqdm
 
 from src.data_loader import get_data_loader
 from src.evaluation import performance_plot
 from src.loss import get_loss_function
-from src.model import DecoderRNN, EncoderCNN
+from src.model import DecoderRNN, DecoderRNNUpdated, EncoderCNN
 from src.optimizer import get_optimizer
 from src.utils import Config, seed_everything
 
-warnings.simplefilter("ignore", category=DeprecationWarning)
+
 
 COMMET_ML_API_KEY = os.environ.get("COMMET_ML_API_KEY")
 experiment = Experiment(
@@ -36,19 +38,6 @@ if __name__ == "__main__":
 
     # Move models to GPU if CUDA is available.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    hyper_params = {
-        "device": str(device),
-        "epochs": config.NUM_EPOCHS,
-        "learning_rate": 1e-4,
-        "batch_size": config.BATCH_SIZE,
-        "vocab_threshold": config.VOCAB_THRESHOLD,
-        "image_embed_soze": config.IMG_EMBED_SIZE,
-        "word_embed_size": config.WORD_EMBED_SIZE,
-        "hidden_zise": config.HIDDEN_SIZE,
-        "dev_mode": config.DEV_MODE,
-    }
-    experiment.log_parameters(hyper_params)
 
     # (Optional) TODO #2: Amend the image transform below.
     transform_train = transforms.Compose(
@@ -97,14 +86,29 @@ if __name__ == "__main__":
     # The size of the vocabulary.
     vocab_size = len(train_data_loader.dataset.vocab)
 
+    hyper_params = {
+        "device": str(device),
+        "epochs": config.NUM_EPOCHS,
+        "learning_rate": 1e-4,
+        "batch_size": config.BATCH_SIZE,
+        "vocab_threshold": config.VOCAB_THRESHOLD,
+        "vocab_size": vocab_size,
+        "image_embed_soze": config.IMG_EMBED_SIZE,
+        "word_embed_size": config.WORD_EMBED_SIZE,
+        "hidden_zise": config.HIDDEN_SIZE,
+        "dev_mode": config.DEV_MODE,
+    }
+    experiment.log_parameters(hyper_params)
+
+
     # Initialize the encoder and decoder.
     encoder = EncoderCNN(config.WORD_EMBED_SIZE)
-    decoder = DecoderRNN(
+    decoder = DecoderRNNUpdated(
         config.WORD_EMBED_SIZE,
         config.HIDDEN_SIZE,
         vocab_size,
         num_layers=2,
-        dropout=0.25,
+        device=device,
     )
 
     encoder.to(device)
@@ -170,9 +174,12 @@ if __name__ == "__main__":
             # Obtain the batch.
             images, captions = next(iter(train_data_loader))
 
+            # make the captions for targets and teacher forcer
+            captions_target = captions[:, 1:].to(device)
+            captions_train = captions[:, : captions.shape[1] - 1].to(device)
+
             # Move batch of images and captions to GPU if CUDA is available.
             images = images.to(device)
-            captions = captions.to(device)
 
             # Zero the gradients.
             decoder.zero_grad()
@@ -180,10 +187,13 @@ if __name__ == "__main__":
 
             # Pass the inputs through the CNN-RNN model.
             features = encoder(images)
-            outputs = decoder(features, captions)
+            outputs = decoder(features, captions_train)
 
             # Calculate the batch loss.
-            loss = criterion(outputs.view(-1, vocab_size), captions.view(-1))
+            loss = criterion(
+                outputs.view(-1, vocab_size),
+                captions_target.contiguous().view(-1),
+            )
 
             # Backward pass.
             loss.backward()
@@ -232,17 +242,23 @@ if __name__ == "__main__":
                 # Obtain the batch.
                 images, captions = next(iter(val_data_loader))
 
+                # make the captions for targets and teacher forcer
+                captions_target = captions[:, 1:].to(device)
+                captions_train = captions[:, : captions.shape[1] - 1].to(
+                    device
+                )
+
                 # Move batch of images and captions to GPU if CUDA is available.
                 images = images.to(device)
-                captions = captions.to(device)
 
                 # Pass the inputs through the CNN-RNN model.
                 features = encoder(images)
-                outputs = decoder(features, captions)
+                outputs = decoder(features, captions_train)
 
                 # Calculate the batch loss.
                 loss = criterion(
-                    outputs.view(-1, vocab_size), captions.view(-1)
+                    outputs.view(-1, vocab_size),
+                    captions_target.contiguous().view(-1),
                 )
                 val_loss = loss.item()
                 total_val_loss += val_loss

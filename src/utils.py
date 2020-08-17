@@ -5,7 +5,10 @@ import numpy as np
 import pandas as pd
 import torch
 import yaml
+import time
 
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize 
 
 def parse_config_file(config_file: str):
 
@@ -28,6 +31,54 @@ def seed_everything(seed: int = 42):
         torch.backends.cudnn.benchmark = False
         torch.cuda.manual_seed_all(seed)
 
+# all timezone neame: https://bit.ly/2MDvGuT
+def set_timezone(tz_name:str='Asia/Calcutta'):
+    os.environ['TZ'] = tz_name 
+    time.tzset()
+    print(f"Time-zone: {time.tzname}")
+
+def tag_date():
+    # https://docs.python.org/2/library/time.html
+    return time.strftime("%Y%m%d")
+
+def tag_date_time():
+    # https://docs.python.org/2/library/time.html
+    return time.strftime("%Y%m%d%H%M")
+
+def sentence_similarity(sentence1: str, sentence2: str):
+    
+    # https://www.geeksforgeeks.org/python-measure-similarity-between-two-sentences-using-cosine-similarity/
+    
+    X = sentence1
+    Y = sentence2
+    
+    # tokenization 
+    X_list = word_tokenize(X)  
+    Y_list = word_tokenize(Y) 
+    
+    # sw contains the list of stopwords 
+    sw = stopwords.words('english')  
+    l1 =[];l2 =[] 
+    
+    # remove stop words from the string 
+    X_set = {w for w in X_list if not w in sw}  
+    Y_set = {w for w in Y_list if not w in sw} 
+    
+    # form a set containing keywords of both strings  
+    rvector = X_set.union(Y_set)  
+    for w in rvector: 
+        if w in X_set: l1.append(1) # create a vector 
+        else: l1.append(0) 
+        if w in Y_set: l2.append(1) 
+        else: l2.append(0) 
+    c = 0
+    
+    # cosine formula  
+    for i in range(len(rvector)): 
+        c+= l1[i]*l2[i] 
+    
+    cosine = c / float((sum(l1)*sum(l2))**0.5) 
+    return np.round(cosine, 4)
 
 class Config:
     def __init__(self, filename: str):

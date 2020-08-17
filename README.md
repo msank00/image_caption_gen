@@ -41,6 +41,21 @@ make train
 make predict
 ```
 
+### Good prediction
+
+```py
+# Good
+# 3375070563_3c290a7991.jpg
+# 3610683688_bbe6d725ed.jpg
+# 3316725440_9ccd9b5417.jpg
+# 3262075846_5695021d84.jpg
+# 2901880865_3fd7b66a45.jpg
+
+# moderate
+# 542179694_e170e9e465.jpg,
+# 2893374123_087f98d58a.jpg
+```
+
 ## :lock: Track experement
 
 - Use [comet ml](https://www.comet.ml/site/)

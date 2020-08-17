@@ -151,3 +151,5 @@ output/
 export.sh
 temp.py 
 debug/
+
+**/*dataset-metadata*.json

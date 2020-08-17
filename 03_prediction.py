@@ -6,11 +6,14 @@ import pandas as pd
 import torch
 from PIL import Image
 from torchvision import transforms
+from typing import List
 
 from src.data_loader import get_data_loader
 from src.model import DecoderRNN, DecoderRNNUpdated, EncoderCNN
-from src.utils import Config, get_training_data
+from src.utils import Config, get_training_data, set_timezone, tag_date_time, sentence_similarity
+import nltk
 
+set_timezone()
 
 def pick_random_test_image(df: pd.DataFrame):
     idx = np.random.randint(low=0, high=len(df))
@@ -48,6 +51,15 @@ def predict_image_caption(
 
     return sentence
 
+def find_bleu_score(hypothesis: str, reference: List[str]):
+    hypothesis = hypothesis.split(" ")
+    reference = [sent.split(" ") for sent in reference]
+    if len(hypothesis) >= 2:
+        BLEUscore = nltk.translate.bleu_score.sentence_bleu(reference, hypothesis, weights = (0.5, 0.5))
+    else:
+        BLEUscore = -1.0
+        
+    return np.round(BLEUscore, 4)
 
 def process_predicted_tokens(output: list):
     """Map list of token ids to list of corresponding words/tokens
@@ -63,13 +75,17 @@ def process_predicted_tokens(output: list):
     for i in output:
         if i == 1:
             continue
-        words_sequence.append(test_data_loader.dataset.vocab.idx2word[i])
+        token = test_data_loader.dataset.vocab.idx2word[i]
+        words_sequence.append(token)
+        
+        if token == ".":
+            break
 
     # words_sequence = words_sequence[1:-1]
     sentence = " ".join(words_sequence)
     # sentence = sentence.capitalize()
 
-    return sentence
+    return sentence.capitalize()
 
 
 if __name__ == "__main__":
@@ -152,6 +168,9 @@ if __name__ == "__main__":
     image_ids = []
     true_captions = []
     pred_captions = []
+    bleu_scores = []
+    sent_similarity = []
+    
     for i in range(n):
         print(i)
         # image_id, caption = pick_random_test_image(df_test)
@@ -171,13 +190,18 @@ if __name__ == "__main__":
         image_ids.append(image_id)
         true_captions.append(caption)
         pred_captions.append(pred_caption)
+        bleu_scores.append(find_bleu_score(pred_caption, [caption]))    
+        sent_similarity.append(sentence_similarity(pred_caption, caption))
 
     df_pred = pd.DataFrame(
         {
             "IMAGE_ID": image_ids,
             "TRUE_CAPTION": true_captions,
             "PRED_CAPTION": pred_captions,
+            "BLEU_SCORE": bleu_scores,
+            "COSINE_SIMILARITY": sent_similarity
         }
     )
-
-    df_pred.to_csv("model/predictions_20200817.csv", index=False)
+    df_pred = df_pred.sort_values(by='COSINE_SIMILARITY', ascending=False).reset_index(drop=True)
+                   
+    df_pred.to_csv(f"model/predictions_{tag_date_time()}.csv", index=False)

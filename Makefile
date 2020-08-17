@@ -37,6 +37,9 @@ clean: clean-pyc
 	rm -rf .ipynb_checkpoints
 	rm -rf src/.ipynb_checkpoints
 
+clean-test-image:
+	rm asset/test_image/*.jpg
+
 format:
 	isort -rc -y .
 	black -l 79 .
@@ -49,7 +52,7 @@ clean-data:
 	python3 00_clean_data.py
 
 train:
-	python3 02_train_new_decoder.py
+	python3 02_train.py
 
 predict:
 	python3 03_prediction.py
@@ -95,9 +98,9 @@ prepare-model-dir:
 	rm model/*.zip
 	mv *.png model/
 	mv *.pt model/
-	mv sample_new.txt model/
 	cp dataset-metadata.json model/
 	mv prediction*.csv model/
+	mv vocab.pkl model/
 	python3 97_update_meta_json.py
 
 
