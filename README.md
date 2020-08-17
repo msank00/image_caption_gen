@@ -70,9 +70,20 @@ This returns a csv file like this which helps to understand the prediction quial
 | `3064383768_f6838f57da.jpg` | A man surf a wave | A man in a wetsuit be surf on a wave | 0.4045 | 0.9129 |
 | `150387174_24825cf871.jpg` | A man be ride a dirt bike over some rock | A man ride a bike down a dirt path | 0.4371 | 0.8571 |
 
-1. To predict on single image please use the Notebook 
+:+1: **Some good prediction sample**
 
-- [ ] _add inference notebook_ [TODO]
+![image](asset/good_prediction.png)
+
+:-1: **Some bad prediction sample**
+
+![image](asset/bad_prediction.png)
+
+
+1. To predict on single/multiple test image please use the below notebook 
+
+- `05_inference.ipynb`
+
+
 
 ### :lock: Track experiment
 

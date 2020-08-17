@@ -6,86 +6,15 @@ import pandas as pd
 import torch
 from PIL import Image
 from torchvision import transforms
-from typing import List
+
 
 from src.data_loader import get_data_loader
 from src.model import DecoderRNN, DecoderRNNUpdated, EncoderCNN
 from src.utils import Config, get_training_data, set_timezone, tag_date_time, sentence_similarity
 import nltk
+from src.utils import pick_random_test_image, copy_file_to_correct_folder, predict_image_caption, find_bleu_score, process_predicted_tokens
 
 set_timezone()
-
-def pick_random_test_image(df: pd.DataFrame):
-    idx = np.random.randint(low=0, high=len(df))
-    image_id = df.iloc[idx]["IMAGE_ID"]
-    caption = df.iloc[idx]["CAPTION"]
-    return image_id, caption
-
-
-def copy_file_to_correct_folder(image_id: str):
-    file_src_path = f"{config.IMAGE_DATA_DIR}{image_id}"
-    file_destination_path = f"asset/test_image/{image_id}"
-    shutil.copy(file_src_path, file_destination_path)
-
-
-def predict_image_caption(
-    image_file: str,
-    transform_image: transforms,
-    model_encoder: EncoderCNN,
-    model_decoder: DecoderRNN,
-    device,
-):
-
-    assert os.path.exists(
-        image_file
-    ), f"Image file: '{image_file}' doesn't not exist."
-    PIL_image = Image.open(image_file).convert("RGB")
-    transformed_image = transform_image(PIL_image)
-    transformed_image = transformed_image.to(device)
-    transformed_image = transformed_image.unsqueeze(
-        dim=0
-    )  # convert size [3, 224, 224] -> [1, 3, 224, 224]
-    features = model_encoder(transformed_image).unsqueeze(1)
-    output = model_decoder.predict_token_ids(features)
-    sentence = process_predicted_tokens(output)
-
-    return sentence
-
-def find_bleu_score(hypothesis: str, reference: List[str]):
-    hypothesis = hypothesis.split(" ")
-    reference = [sent.split(" ") for sent in reference]
-    if len(hypothesis) >= 2:
-        BLEUscore = nltk.translate.bleu_score.sentence_bleu(reference, hypothesis, weights = (0.5, 0.5))
-    else:
-        BLEUscore = -1.0
-        
-    return np.round(BLEUscore, 4)
-
-def process_predicted_tokens(output: list):
-    """Map list of token ids to list of corresponding words/tokens
-       using the vocabulary dictionary idx2word. 
-
-    :param output: list of predicted token ids
-    :type output: list
-    :return: list of tokens
-    :rtype: list
-    """
-    words_sequence = []
-
-    for i in output:
-        if i == 1:
-            continue
-        token = test_data_loader.dataset.vocab.idx2word[i]
-        words_sequence.append(token)
-        
-        if token == ".":
-            break
-
-    # words_sequence = words_sequence[1:-1]
-    sentence = " ".join(words_sequence)
-    # sentence = sentence.capitalize()
-
-    return sentence.capitalize()
 
 
 if __name__ == "__main__":
@@ -185,6 +114,7 @@ if __name__ == "__main__":
             transform_image=transform_test,
             model_encoder=encoder,
             model_decoder=decoder,
+            test_data_loader=test_data_loader,
             device=device,
         )
         image_ids.append(image_id)
