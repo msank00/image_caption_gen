@@ -37,19 +37,6 @@ if __name__ == "__main__":
     # Move models to GPU if CUDA is available.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    hyper_params = {
-        "device": str(device),
-        "epochs": config.NUM_EPOCHS,
-        "learning_rate": 1e-4,
-        "batch_size": config.BATCH_SIZE,
-        "vocab_threshold": config.VOCAB_THRESHOLD,
-        "image_embed_soze": config.IMG_EMBED_SIZE,
-        "word_embed_size": config.WORD_EMBED_SIZE,
-        "hidden_zise": config.HIDDEN_SIZE,
-        "dev_mode": config.DEV_MODE,
-    }
-    experiment.log_parameters(hyper_params)
-
     # (Optional) TODO #2: Amend the image transform below.
     transform_train = transforms.Compose(
         [
@@ -96,6 +83,21 @@ if __name__ == "__main__":
 
     # The size of the vocabulary.
     vocab_size = len(train_data_loader.dataset.vocab)
+
+    hyper_params = {
+        "device": str(device),
+        "epochs": config.NUM_EPOCHS,
+        "learning_rate": 1e-4,
+        "batch_size": config.BATCH_SIZE,
+        "vocab_threshold": config.VOCAB_THRESHOLD,
+        "vocab_size": vocab_size,
+        "image_embed_soze": config.IMG_EMBED_SIZE,
+        "word_embed_size": config.WORD_EMBED_SIZE,
+        "hidden_zise": config.HIDDEN_SIZE,
+        "dev_mode": config.DEV_MODE,
+    }
+    experiment.log_parameters(hyper_params)
+
 
     # Initialize the encoder and decoder.
     encoder = EncoderCNN(config.WORD_EMBED_SIZE)
