@@ -1,13 +1,15 @@
+from comet_ml import Experiment
+
 import math
 import os
 import time
 import warnings
+warnings.simplefilter("ignore", category=DeprecationWarning)
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.utils.data as data
-from comet_ml import Experiment
 from torchvision import transforms
 from tqdm import tqdm
 
@@ -18,7 +20,7 @@ from src.model import DecoderRNN, DecoderRNNUpdated, EncoderCNN
 from src.optimizer import get_optimizer
 from src.utils import Config, seed_everything
 
-warnings.simplefilter("ignore", category=DeprecationWarning)
+
 
 COMMET_ML_API_KEY = os.environ.get("COMMET_ML_API_KEY")
 experiment = Experiment(
