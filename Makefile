@@ -16,8 +16,8 @@ kaggle-api:
 
 
 git-config:
-	git config user.email "sankarshan7@gmail.com"
-	git config user.name "Sankarshan Mridha"
+	git config user.email "email@email"
+	git config user.name "Name"
 
 
 
@@ -110,7 +110,7 @@ publish-output:
 	kaggle datasets version -p model -m "Updated data"
 
 
-quick-setup: project-template kaggle-api env git-config
+quick-setup: project-template kaggle-api env 
 
 set-data: data-download prep-main-data prepare-model-dir
 

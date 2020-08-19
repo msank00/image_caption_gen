@@ -15,7 +15,58 @@ Apart from the main code, there are lots of helper code, which were needed as th
 
 :pushpin: For quick prototyping, logic validation, silent/non-silent bug fixing, you can run the code in `DEV_MODE`. Set it to `True` in config file. This will run the code with smaller number of datasets to test the pipeline end-to-end. Once you are satisfied, set it to `False` to train and predict on full dataset. 
 
-Many helper functions are given in the makefile, which may not be needed directly. They were needed for setting up the project in GPU machine in a (semi)-automatic fashion using all those helper methods. But to make things easier, let me explain how to execute the main pieces of this repo.
+### Execution Flow
+
+The execution flow of this project may look non-trivial initally. But once explained, you will realise, why it's like that. The reason was to 
+- Develop faster in local cpu machine (laptop)
+- Push to GPU machine for training on full data
+- Track experiment
+- Predict
+- Save all artifacts
+- Iterate to debug model and finetune. The below diagram might be helpful:
+
+![image](asset/experiment_flow.png)
+
+_*Running code in `dev mode` actually runs the whole training pipeline on a smaller dataset to test pipeline end to end._
+
+**Why this flow is helpful?**
+
+- If you own a GPU, then all these steps mey be redundant. But like me, many of us don't own one. And developing code in AWS/Azure/Google Cloud is expensive. So to mitigate that, this execution flow was created. Where from project setup, data download to train, predict, artifacts saving - all can be controlled via Makefile.
+
+For a smooth execution of all the piece, first export these variables
+
+```py
+export COMMET_ML_API_KEY="******************"
+export KAGGLE_USER_NAME="******************"
+export KAGGLE_API_KEY="******************"
+export KAGGLE_DATASET_ID="******************"
+```
+
+- `KAGGLE_DATASET_ID` refers to the location, where you will save the artifacts (model file, training performance plot and prediction output) for future reference after complete GPU/CPU training.
+- `COMMET_ML_API_KEY` needed for experiment tracking.
+
+
+Many helper functions are given in the makefile, which may not be needed directly. They were needed for setting up the project 
+in GPU machine in a (semi)-automatic fashion. Please look into the `Makefile`  for proper understanding. The main Makefile modules are:
+
+```py
+quick-setup: project-template kaggle-api env 
+set-data: data-download prep-main-data prepare-model-dir
+pipeline: clean-data train predict publish-output
+```
+
+So if the config file is set properly, then all you need to do is
+
+```py
+make quick-setup
+make set-data
+make pipeline
+```
+
+
+But to make things easier, let me explain how to execute the main pieces of this repo.
+
+
 
 ### :floppy_disk: Dataset
 
@@ -61,7 +112,7 @@ make train
 make predict
 ```
 
-This returns a csv file like this which helps to understand the prediction quiality
+This returns a `prediction_<date_tag>.csv` file like this which helps to understand the prediction quiality
 
 | IMAGE_ID | TRUE_CAPTION | PRED_CAPTION | BLEU_SCORE | COSINE_SIMILARITY |
 |-|-|-|-|-|
@@ -79,10 +130,17 @@ This returns a csv file like this which helps to understand the prediction quial
 ![image](asset/bad_prediction.png)
 
 
-1. To predict on single/multiple test image please use the below notebook 
+2. To predict on single/multiple test image please use the below notebook 
 
 - `05_inference.ipynb`
 
+3. There is also a simple web app available, built using `streamlit`, to check random prediction result from the test dataset. This shows random prediction output from the `prediction_<date_tag>.csv` file (obtained above). Run the below script
+
+```py
+make prediction-check:
+```
+
+![image](asset/demo_pred.png)
 
 
 ### :lock: Track experiment
@@ -122,7 +180,11 @@ Output, is _almost never interpreted directly_. If the input is encoded there sh
 
 Note: In language modeling hidden states are used to define the probability of the next word, p(wt+1|w1,...,wt) =softmax(Wht+b).
 
+## Understand PyTorch `nn.LSTM()`
 
+- [long-short-term-memory-from-zero-to-hero-with-pytorch](https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/)
+
+----
 
 **Reference:**
  
