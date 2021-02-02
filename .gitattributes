@@ -2,4 +2,4 @@
 #*.ipynb linguist-language=Python
 
 
-.ipynb linguist-documentation
+*.ipynb linguist-documentation
